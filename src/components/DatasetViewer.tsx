@@ -9,37 +9,65 @@ import { X } from "lucide-react";
 
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<Translation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     loadTranslations();
   }, []);
   
-  const loadTranslations = () => {
-    const data = getTranslations();
-    setTranslations(data);
+  const loadTranslations = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getTranslations();
+      setTranslations(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load translations.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleDelete = (id: number) => {
-    deleteTranslation(id);
-    loadTranslations();
-    toast({
-      title: "Translation deleted",
-      description: "The entry has been removed from the dataset."
-    });
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTranslation(id);
+      await loadTranslations();
+      toast({
+        title: "Translation deleted",
+        description: "The entry has been removed from the dataset."
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete translation.",
+        variant: "destructive"
+      });
+    }
   };
   
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (window.confirm("Are you sure you want to delete all translations? This cannot be undone.")) {
-      clearAllTranslations();
-      loadTranslations();
-      toast({
-        title: "Dataset cleared",
-        description: "All translations have been removed."
-      });
+      try {
+        await clearAllTranslations();
+        await loadTranslations();
+        toast({
+          title: "Dataset cleared",
+          description: "All translations have been removed."
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to clear translations.",
+          variant: "destructive"
+        });
+      }
     }
   };
   
-  const handleExportJSON = () => {
+  const handleExportJSON = async () => {
     if (translations.length === 0) {
       toast({
         title: "Export failed",
@@ -49,25 +77,33 @@ const DatasetViewer = () => {
       return;
     }
     
-    const jsonData = exportTranslationsAsJSON();
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ibono_translations.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Export successful",
-      description: "The dataset has been exported as JSON."
-    });
+    try {
+      const jsonData = await exportTranslationsAsJSON();
+      const blob = new Blob([jsonData], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ibono_translations.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export successful",
+        description: "The dataset has been exported as JSON."
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export data.",
+        variant: "destructive"
+      });
+    }
   };
   
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     if (translations.length === 0) {
       toast({
         title: "Export failed",
@@ -77,22 +113,30 @@ const DatasetViewer = () => {
       return;
     }
     
-    const csvData = exportTranslationsAsCSV();
-    const blob = new Blob([csvData], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ibono_translations.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Export successful",
-      description: "The dataset has been exported as CSV."
-    });
+    try {
+      const csvData = await exportTranslationsAsCSV();
+      const blob = new Blob([csvData], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ibono_translations.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export successful",
+        description: "The dataset has been exported as CSV."
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export data.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -104,7 +148,11 @@ const DatasetViewer = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {translations.length > 0 ? (
+        {isLoading ? (
+          <div className="py-8 text-center text-muted-foreground">
+            Loading translations...
+          </div>
+        ) : translations.length > 0 ? (
           <div className="border rounded-md overflow-hidden">
             <Table>
               <TableHeader>

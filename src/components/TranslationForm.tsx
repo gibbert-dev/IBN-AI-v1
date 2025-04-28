@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ const TranslationForm = () => {
   const [ibonoText, setIbonoText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!englishText.trim() || !ibonoText.trim()) {
@@ -27,11 +26,11 @@ const TranslationForm = () => {
     setIsSubmitting(true);
     
     try {
-      saveTranslation(englishText, ibonoText);
+      await saveTranslation(englishText, ibonoText);
       
       toast({
         title: "Success!",
-        description: "Translation saved to the dataset.",
+        description: "Translation saved to the database.",
       });
       
       // Clear the form

@@ -1,4 +1,6 @@
 
+import { supabase } from './supabaseClient';
+
 export interface Translation {
   id: number;
   english: string;
@@ -6,46 +8,75 @@ export interface Translation {
   timestamp: string;
 }
 
-const DB_KEY = "ibonai-translations";
+// Table name in Supabase
+const TABLE_NAME = "translations";
 
-export const saveTranslation = (english: string, ibono: string): Translation => {
-  const translations = getTranslations();
-  
-  const newTranslation: Translation = {
-    id: Date.now(),
+export const saveTranslation = async (english: string, ibono: string): Promise<Translation> => {
+  const newTranslation: Omit<Translation, 'id'> = {
     english,
     ibono,
     timestamp: new Date().toISOString()
   };
   
-  const updatedTranslations = [...translations, newTranslation];
-  localStorage.setItem(DB_KEY, JSON.stringify(updatedTranslations));
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .insert([newTranslation])
+    .select()
+    .single();
+    
+  if (error) {
+    console.error("Error saving translation:", error);
+    throw error;
+  }
   
-  return newTranslation;
+  return data as Translation;
 };
 
-export const getTranslations = (): Translation[] => {
-  const data = localStorage.getItem(DB_KEY);
-  return data ? JSON.parse(data) : [];
+export const getTranslations = async (): Promise<Translation[]> => {
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select('*')
+    .order('timestamp', { ascending: false });
+    
+  if (error) {
+    console.error("Error fetching translations:", error);
+    throw error;
+  }
+  
+  return data as Translation[];
 };
 
-export const deleteTranslation = (id: number): void => {
-  const translations = getTranslations();
-  const filtered = translations.filter(item => item.id !== id);
-  localStorage.setItem(DB_KEY, JSON.stringify(filtered));
+export const deleteTranslation = async (id: number): Promise<void> => {
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .delete()
+    .eq('id', id);
+    
+  if (error) {
+    console.error("Error deleting translation:", error);
+    throw error;
+  }
 };
 
-export const clearAllTranslations = (): void => {
-  localStorage.removeItem(DB_KEY);
+export const clearAllTranslations = async (): Promise<void> => {
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .delete()
+    .neq('id', 0); // Deletes all records
+    
+  if (error) {
+    console.error("Error clearing translations:", error);
+    throw error;
+  }
 };
 
-export const exportTranslationsAsJSON = (): string => {
-  const translations = getTranslations();
+export const exportTranslationsAsJSON = async (): Promise<string> => {
+  const translations = await getTranslations();
   return JSON.stringify(translations, null, 2);
 };
 
-export const exportTranslationsAsCSV = (): string => {
-  const translations = getTranslations();
+export const exportTranslationsAsCSV = async (): Promise<string> => {
+  const translations = await getTranslations();
   if (translations.length === 0) return "";
   
   const headers = "id,english,ibono,timestamp\n";
