@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom Ibn-AI colors
+				ibonai: {
+					green: '#0A7B53',
+					orange: '#E85D04',
+					lightGreen: '#3BB78F',
+					cream: '#FFF5E1',
+					darkBlue: '#172A3A',
 				}
 			},
 			borderRadius: {
