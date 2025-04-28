@@ -1,4 +1,3 @@
-
 import { supabase } from './supabaseClient';
 
 export interface Translation {
@@ -18,32 +17,52 @@ export const saveTranslation = async (english: string, ibono: string): Promise<T
     // Supabase will handle the created_at timestamp automatically
   };
   
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .insert([newTranslation])
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .insert([newTranslation])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error("Error saving translation:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      throw error;
+    }
     
-  if (error) {
-    console.error("Error saving translation:", error);
-    throw error;
+    return data as Translation;
+  } catch (e) {
+    console.error("Unexpected error during save:", e);
+    throw e;
   }
-  
-  return data as Translation;
 };
 
 export const getTranslations = async (): Promise<Translation[]> => {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      console.error("Error fetching translations:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      throw error;
+    }
     
-  if (error) {
-    console.error("Error fetching translations:", error);
-    throw error;
+    return data as Translation[];
+  } catch (e) {
+    console.error("Unexpected error during fetch:", e);
+    throw e;
   }
-  
-  return data as Translation[];
 };
 
 export const deleteTranslation = async (id: number): Promise<void> => {
@@ -71,8 +90,20 @@ export const clearAllTranslations = async (): Promise<void> => {
 };
 
 export const exportTranslationsAsJSON = async (): Promise<string> => {
-  const translations = await getTranslations();
-  return JSON.stringify(translations, null, 2);
+  try {
+    const translations = await getTranslations();
+    // Ensure the data is serializable
+    const cleanData = translations.map(t => ({
+      id: t.id,
+      english: t.english,
+      ibono: t.ibono,
+      created_at: t.created_at || null
+    }));
+    return JSON.stringify(cleanData, null, 2);
+  } catch (error) {
+    console.error("Error exporting JSON:", error);
+    throw new Error("Failed to export translations as JSON");
+  }
 };
 
 export const exportTranslationsAsCSV = async (): Promise<string> => {

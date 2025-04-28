@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,7 +79,11 @@ const DatasetViewer = () => {
     
     try {
       const jsonData = await exportTranslationsAsJSON();
-      const blob = new Blob([jsonData], { type: "application/json" });
+      // Validate that the JSON is parseable before creating blob
+      JSON.parse(jsonData); // This will throw if invalid
+      const blob = new Blob([jsonData], { 
+        type: "application/json;charset=utf-8"
+      });
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement("a");
@@ -96,9 +99,10 @@ const DatasetViewer = () => {
         description: "The dataset has been exported as JSON."
       });
     } catch (error) {
+      console.error("JSON export error:", error);
       toast({
         title: "Export failed",
-        description: "Failed to export data.",
+        description: error instanceof Error ? error.message : "Failed to export data.",
         variant: "destructive"
       });
     }
