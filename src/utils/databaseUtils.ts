@@ -5,17 +5,17 @@ export interface Translation {
   id: number;
   english: string;
   ibono: string;
-  timestamp: string;
+  created_at?: string; // Using created_at instead of timestamp as it's likely Supabase's default
 }
 
 // Table name in Supabase
 const TABLE_NAME = "translations";
 
 export const saveTranslation = async (english: string, ibono: string): Promise<Translation> => {
-  const newTranslation: Omit<Translation, 'id'> = {
+  const newTranslation = {
     english,
     ibono,
-    timestamp: new Date().toISOString()
+    // Supabase will handle the created_at timestamp automatically
   };
   
   const { data, error } = await supabase
@@ -36,7 +36,7 @@ export const getTranslations = async (): Promise<Translation[]> => {
   const { data, error } = await supabase
     .from(TABLE_NAME)
     .select('*')
-    .order('timestamp', { ascending: false });
+    .order('created_at', { ascending: false });
     
   if (error) {
     console.error("Error fetching translations:", error);
@@ -79,9 +79,9 @@ export const exportTranslationsAsCSV = async (): Promise<string> => {
   const translations = await getTranslations();
   if (translations.length === 0) return "";
   
-  const headers = "id,english,ibono,timestamp\n";
+  const headers = "id,english,ibono,created_at\n";
   const rows = translations.map(t => 
-    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.timestamp}`
+    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.created_at || ''}`
   ).join("\n");
   
   return headers + rows;

@@ -21,6 +21,7 @@ const DatasetViewer = () => {
       const data = await getTranslations();
       setTranslations(data);
     } catch (error) {
+      console.error("Error fetching translations:", error);
       toast({
         title: "Error",
         description: "Failed to load translations.",
