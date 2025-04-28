@@ -13,15 +13,17 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <SidebarProvider defaultOpen={false}>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
       </SidebarProvider>
     </TooltipProvider>
   </QueryClientProvider>
