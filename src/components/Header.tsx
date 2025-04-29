@@ -31,7 +31,7 @@ const Header = ({ onSidebarToggle }: HeaderProps) => {
             <h1 className="text-xl sm:text-2xl font-bold text-white/95">IBN-AI</h1>
           </div>
         </div>
-        <div className="bg-white/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full">
+        <div className="ml-auto bg-white/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full">
           <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-white/90`}>
             Building Ibọnọ Language AI
           </p>
