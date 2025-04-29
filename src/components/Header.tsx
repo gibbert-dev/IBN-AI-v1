@@ -24,7 +24,7 @@ const Header = ({ onSidebarToggle }: HeaderProps) => {
             <img 
               src={import.meta.env.BASE_URL + 'logo.png'} 
               alt="IBN-AI Logo" 
-              className="h-6 w-6 sm:h-8 sm:w-8 object-contain filter drop-shadow-md"
+              className="h-8 w-8 sm:h-12 sm:w-12 object-contain filter drop-shadow-xl hover:drop-shadow-2xl transition-all duration-300 animate-pulse-slow rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 p-1 border-2 border-white/30"
               loading="eager"
               draggable="false"
             />
