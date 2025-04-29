@@ -1,76 +1,179 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 const IbenoInfo = () => {
-  const [activeTab, setActiveTab] = useState("about");
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const culturalFacts = [
-    { id: "1", title: "Rich Maritime Heritage", content: "Ibeno is known for its rich fishing tradition and maritime culture, with generations of skilled fishermen contributing to its economy." },
-    { id: "2", title: "Beautiful Beaches", content: "Home to one of the longest sand beaches in West Africa, Ibeno Beach stretches over 45km along the Atlantic coast." },
-    { id: "3", title: "Local Festivals", content: "The community celebrates various cultural festivals throughout the year, showcasing traditional dances and ceremonies." },
-    { id: "4", title: "Traditional Cuisine", content: "Ibeno is famous for its fresh seafood dishes and traditional cooking methods passed down through generations." }
+  const sections = [
+    {
+      id: "background",
+      title: "Background",
+      content: `The Ibeno people are primarily located in Ibeno Local Government Area (LGA) of Akwa Ibom State, Nigeria, a coastal region known for fishing and oil activities. The Obolo people, also called Andoni or Doni, are a multi-ethnic group found in Rivers State, Akwa Ibom State, and other nearby states, occupying the Cross River Basin in the Niger Delta.`
+    },
+    {
+      id: "connection",
+      title: "Connection to Obolo",
+      content: `The Ibeno people are part of the Obolo ethnic group, particularly in Akwa Ibom State. This is supported by shared language, Ibọnọ (also known as Obolo or Ibono-Obolo), and historical interactions. Sources confirm that the Obolo ethnic group comprises both Ibono (Ibeno) and Eastern Obolo, highlighting their shared identity.`
+    }
+  ];
+
+  const linguisticInfo = [
+    {
+      id: "classification",
+      title: "Language Classification",
+      content: `Ibọnọ (pronounced [ee-boh-naw]), also known as Obolo, is a distinct language spoken by the Ibeno and Eastern Obolo people. Linguistic studies, including those by Kay Williamson (1987), categorize it within the Lower Cross branch of the Cross River group, highlighting its unique linguistic structure and relation to neighboring languages.`
+    },
+    {
+      id: "dialects",
+      title: "Dialects and Relationships",
+      content: `The Iko dialect in Eastern Obolo is closely related to the Okoroutip dialect in Ibeno LGA. While Ibọnọ has adopted some terms from neighboring languages like Ibibio and Efik, it maintains its distinct linguistic structure, grammar, and core vocabulary as an independent language.`
+    }
+  ];
+
+  const culturalAspects = [
+    {
+      id: "traditions",
+      title: "Traditional Practices",
+      content: `The Ibeno people maintain rich cultural traditions including the Ekpe society, traditional governance systems, and maritime customs. These practices have been preserved through generations and continue to play vital roles in community life.`
+    },
+    {
+      id: "institutions",
+      title: "Cultural Institutions",
+      content: `Traditional institutions like Ekpe, Obon, and Uke are integral to Ibeno culture and are also recognized in broader Obolo culture. These institutions help preserve and transmit cultural knowledge and values across generations.`
+    }
+  ];
+
+  const historicalContext = [
+    {
+      id: "migration",
+      title: "Historical Migration",
+      content: `Both the Ibeno and Obolo people migrated from areas around the Cross River basin centuries ago, settling along the Atlantic coastline. This migration was part of a broader movement in the Niger Delta region, involving interactions with groups like Bonny, Okrika, Kalabari, and Nkoro.`
+    },
+    {
+      id: "development",
+      title: "Cultural Development",
+      content: `The Ibeno people developed their distinct identity while maintaining strong cultural and linguistic ties with the broader Obolo community. Their strategic coastal location made them important players in maritime trade and cultural exchange.`
+    }
   ];
 
   return (
-    <Card className="w-full mt-8 shadow-lg border border-teal-100">
-      <CardHeader className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-400 text-white rounded-t-lg">
-        <CardTitle className="text-2xl font-bold tracking-tight">Discover Ibeno</CardTitle>
-        <CardDescription className="text-white/90 text-base">
-          Explore the culture, history, and beauty of Ibeno
+    <Card className="w-full mt-8 shadow-lg border border-border">
+      <CardHeader className="bg-gradient-header text-white rounded-t-lg p-6">
+        <CardTitle className="text-2xl md:text-3xl font-bold tracking-tight">The Ibeno People</CardTitle>
+        <CardDescription className="text-white/90 text-base md:text-lg">
+          A comprehensive exploration of Ibeno heritage, language, and identity
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6 bg-gradient-to-b from-white to-blue-50/30 rounded-b-lg">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-teal-50 rounded-lg mb-2">
-            <TabsTrigger value="about" className="data-[state=active]:bg-teal-100 data-[state=active]:text-teal-900 transition-colors">About</TabsTrigger>
-            <TabsTrigger value="culture" className="data-[state=active]:bg-teal-100 data-[state=active]:text-teal-900 transition-colors">Culture</TabsTrigger>
-            <TabsTrigger value="gallery" className="data-[state=active]:bg-teal-100 data-[state=active]:text-teal-900 transition-colors">Gallery</TabsTrigger>
-            <TabsTrigger value="facts" className="data-[state=active]:bg-teal-100 data-[state=active]:text-teal-900 transition-colors">Fun Facts</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="about" className="mt-4">
-            <div className="prose max-w-none text-gray-700 text-base leading-relaxed">
-              <p>Ibeno is a coastal Local Government Area in Akwa Ibom State, Nigeria, known for its beautiful beaches, rich fishing heritage, and vibrant culture. Located along the Atlantic coast, it serves as home to diverse communities and plays a significant role in Nigeria's maritime economy.</p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="culture" className="mt-4">
-            <Accordion type="single" collapsible>
-              {culturalFacts.map((fact) => (
-                <AccordionItem key={fact.id} value={fact.id} className="border-b last:border-b-0">
-                  <AccordionTrigger className="font-semibold text-teal-800 hover:bg-teal-50 transition-colors px-2 py-2 rounded-md">{fact.title}</AccordionTrigger>
-                  <AccordionContent className="text-gray-700 bg-gradient-to-r from-teal-50 to-blue-50 rounded-md px-4 py-2 mb-2">{fact.content}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </TabsContent>
-          
-          <TabsContent value="gallery" className="mt-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[1,2,3].map((i) => (
-                <div key={i} className="aspect-video bg-gradient-to-br from-teal-50 via-blue-50 to-teal-100 rounded-lg flex items-center justify-center border border-teal-200 shadow-inner hover:shadow-md transition-all">
-                  <span className="text-sm text-teal-700 font-medium">Image Placeholder</span>
+      <CardContent className="pt-6">
+        <ScrollArea className="h-[600px] pr-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-muted rounded-lg mb-4 sticky top-0">
+              <TabsTrigger 
+                value="overview" 
+                className="data-[state=active]:bg-gradient-brand data-[state=active]:text-white transition-all"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="language" 
+                className="data-[state=active]:bg-gradient-brand data-[state=active]:text-white transition-all"
+              >
+                Language
+              </TabsTrigger>
+              <TabsTrigger 
+                value="culture" 
+                className="data-[state=active]:bg-gradient-brand data-[state=active]:text-white transition-all"
+              >
+                Culture
+              </TabsTrigger>
+              <TabsTrigger 
+                value="history" 
+                className="data-[state=active]:bg-gradient-brand data-[state=active]:text-white transition-all"
+              >
+                History
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="mt-4 space-y-6">
+              {sections.map((section) => (
+                <div key={section.id} className="p-6 bg-gradient-card rounded-lg border border-border hover:shadow-md transition-all">
+                  <h3 className="font-semibold mb-3 text-primary text-xl">{section.title}</h3>
+                  <p className="text-foreground/80 leading-relaxed">{section.content}</p>
                 </div>
               ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="facts" className="mt-4">
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg border border-teal-100 hover:shadow-md transition-all">
-                <h3 className="font-semibold mb-2 text-teal-800">Did You Know?</h3>
-                <p className="text-gray-700">Ibeno Beach is one of the longest sand beaches in West Africa!</p>
+              <div className="p-6 bg-gradient-card rounded-lg border border-border">
+                <h3 className="font-semibold mb-3 text-primary text-xl">Classification Complexity</h3>
+                <p className="text-foreground/80 leading-relaxed mb-4">
+                  While some sources group Ibeno with Ibibio, Annang, Ekid, and Oron due to shared cultural elements, evidence strongly supports their classification as part of the Obolo ethnic group, particularly in Akwa Ibom State context.
+                </p>
+                <p className="text-foreground/80 leading-relaxed">
+                  This complexity reflects the fluid nature of ethnic identities in Nigeria, where groups can be classified differently based on various cultural, linguistic, and administrative criteria.
+                </p>
               </div>
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-teal-100 hover:shadow-md transition-all">
-                <h3 className="font-semibold mb-2 text-teal-800">Geography</h3>
-                <p className="text-gray-700">Ibeno is located in the coastal southern part of Akwa Ibom State, bordered by the Atlantic Ocean.</p>
+            </TabsContent>
+            
+            <TabsContent value="language" className="mt-4">
+              <div className="space-y-6">
+                {linguisticInfo.map((info) => (
+                  <div key={info.id} className="p-6 bg-gradient-card rounded-lg border border-border">
+                    <h3 className="font-semibold mb-3 text-primary text-xl">{info.title}</h3>
+                    <p className="text-foreground/80 leading-relaxed">{info.content}</p>
+                  </div>
+                ))}
+                <Accordion type="single" collapsible className="space-y-2">
+                  <AccordionItem value="influence" className="bg-gradient-card rounded-lg border border-border">
+                    <AccordionTrigger className="px-6 hover:bg-accent/5">
+                      <span className="text-primary font-semibold">Language Evolution & Influence</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-4">
+                      <p className="text-foreground/80 leading-relaxed">
+                        Just as English incorporates loanwords from French, Latin, and Italian, Ibọnọ has adopted certain words from neighboring languages. However, these borrowings don't diminish its status as an independent language with its own distinct structure and core vocabulary.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+            
+            <TabsContent value="culture" className="mt-4">
+              <div className="space-y-6">
+                {culturalAspects.map((aspect) => (
+                  <div key={aspect.id} className="p-6 bg-gradient-card rounded-lg border border-border">
+                    <h3 className="font-semibold mb-3 text-primary text-xl">{aspect.title}</h3>
+                    <p className="text-foreground/80 leading-relaxed">{aspect.content}</p>
+                  </div>
+                ))}
+                <div className="p-6 bg-gradient-card rounded-lg border border-border">
+                  <h3 className="font-semibold mb-3 text-primary text-xl">Maritime Heritage</h3>
+                  <p className="text-foreground/80 leading-relaxed">
+                    The coastal location has profoundly shaped Ibeno culture, with fishing and maritime activities being central to both economy and cultural identity. This maritime heritage is reflected in traditions, celebrations, and daily life.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="history" className="mt-4">
+              <div className="space-y-6">
+                {historicalContext.map((context) => (
+                  <div key={context.id} className="p-6 bg-gradient-card rounded-lg border border-border">
+                    <h3 className="font-semibold mb-3 text-primary text-xl">{context.title}</h3>
+                    <p className="text-foreground/80 leading-relaxed">{context.content}</p>
+                  </div>
+                ))}
+                <div className="p-6 bg-gradient-card rounded-lg border border-border">
+                  <h3 className="font-semibold mb-3 text-primary text-xl">Administrative Context</h3>
+                  <p className="text-foreground/80 leading-relaxed">
+                    While Ibeno and Eastern Obolo are separate Local Government Areas, they share deep ethnic and cultural connections. The administrative boundaries don't fully reflect the broader ethnic ties that bind these communities together under the Obolo identity.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </ScrollArea>
       </CardContent>
     </Card>
   );

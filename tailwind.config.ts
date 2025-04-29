@@ -62,13 +62,19 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom Ibn-AI colors
 				ibonai: {
 					green: '#0A7B53',
-					orange: '#E85D04',
 					lightGreen: '#3BB78F',
-					cream: '#FFF5E1',
+					blue: '#0EA5E9',
 					darkBlue: '#172A3A',
+					orange: '#E85D04',
+					cream: '#FFF5E1',
+					gradient: {
+						primary: 'linear-gradient(to right, #0A7B53, #3BB78F)',
+						secondary: 'linear-gradient(to right, #0EA5E9, #3BB78F)',
+						header: 'linear-gradient(to right, #0EA5E9, #3BB78F, #0EA5E9)',
+						card: 'linear-gradient(to right, rgba(10, 123, 83, 0.05), rgba(59, 183, 143, 0.05))'
+					}
 				}
 			},
 			borderRadius: {
