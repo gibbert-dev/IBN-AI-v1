@@ -24,11 +24,11 @@ const Header = ({
     // Show visual feedback that the character was copied
     const activeElement = document.activeElement as HTMLElement;
     if (activeElement && activeElement.tagName === 'TEXTAREA') {
-      const start = activeElement.selectionStart || 0;
-      const end = activeElement.selectionEnd || 0;
-      const value = (activeElement as HTMLTextAreaElement).value;
-      (activeElement as HTMLTextAreaElement).value = value.substring(0, start) + char + value.substring(end);
-      activeElement.setSelectionRange(start + char.length, start + char.length);
+      const textArea = activeElement as HTMLTextAreaElement;
+      const start = textArea.selectionStart || 0;
+      const end = textArea.selectionEnd || 0;
+      textArea.value = textArea.value.substring(0, start) + char + textArea.value.substring(end);
+      textArea.setSelectionRange(start + char.length, start + char.length);
     } else {
       // If no active textarea, just copy to clipboard
       console.log(`Character ${char} copied to clipboard`);
