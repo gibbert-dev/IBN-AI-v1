@@ -1,73 +1,115 @@
-# Welcome to your Lovable project
+# IBN-AI: Ibọnọ Translation Project
 
-## Project info
+## About the Project
 
-**URL**: https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc
+IBN-AI is a community-driven initiative to develop AI translation tools for the Ibọnọ language, preserving linguistic heritage through modern technology. The project aims to create a comprehensive English-Ibọnọ translation system by collecting translation pairs and training machine learning models.
 
-## How can I edit this code?
+### What is Ibọnọ?
+Ibọnọ (pronounced [ee-boh-naw]) is a Nigerian language spoken by the Ibeno people, part of the Obolo ethnic group in Akwa Ibom State. It is a Lower Cross River language within the Niger-Congo family and is considered an endangered language that needs documentation and preservation efforts.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Translation Contribution System**
+  - User-friendly form for submitting English-Ibọnọ translation pairs
+  - Special character input support for Ibọnọ-specific characters (ọ, ị, n̄, ǝ)
+  - Dataset management and export capabilities (JSON/CSV)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) and start prompting.
+- **Translation Demo**
+  - Interactive translation interface
+  - Real-time translation preview
+  - Supports common phrases and vocabulary
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Educational Resources**
+  - Comprehensive information about the Ibọnọ language
+  - Cultural context and linguistic characteristics
+  - Community engagement features
 
-**Use your preferred IDE**
+- **ML Pipeline Integration**
+  1. Data Collection through user contributions
+  2. Dataset Export for preprocessing
+  3. Model Training using Hugging Face
+  4. Model Deployment for translation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technologies Used
 
 This project is built with:
+- Vite - Next Generation Frontend Tooling
+- TypeScript - Type-safe JavaScript
+- React - UI Framework
+- shadcn/ui - High-quality UI components
+- Tailwind CSS - Utility-first CSS framework
+- Supabase - Backend and Database
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Getting Started
 
-## How can I deploy this project?
+### Prerequisites
+- Node.js & npm installed ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
 
-Simply open [Lovable](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) and click on Share -> Publish.
+### Installation
 
-## Can I connect a custom domain to my Lovable project?
+1. Clone the repository:
+\`\`\`sh
+git clone <YOUR_GIT_URL>
+\`\`\`
 
-Yes, you can!
+2. Navigate to the project directory:
+\`\`\`sh
+cd <YOUR_PROJECT_NAME>
+\`\`\`
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+3. Install dependencies:
+\`\`\`sh
+npm install
+\`\`\`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+4. Start the development server:
+\`\`\`sh
+npm run dev
+\`\`\`
+
+## Development Options
+
+### Using Lovable
+Visit the [Lovable Project](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) and start prompting. Changes are automatically committed.
+
+### Using GitHub Codespaces
+1. Navigate to the repository's main page
+2. Click "Code" > "Codespaces" tab
+3. Click "New codespace"
+
+### Using Local IDE
+Clone the repository and push changes. Changes will reflect in Lovable.
+
+## Deployment
+
+Deploy through [Lovable](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) by clicking Share -> Publish.
+
+### Custom Domain Setup
+1. Navigate to Project > Settings > Domains
+2. Click Connect Domain
+3. Follow the [domain setup guide](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Contributing
+
+We welcome contributions from the community! You can help by:
+- Adding new English-Ibọnọ translation pairs
+- Improving the ML pipeline
+- Enhancing the UI/UX
+- Providing cultural and linguistic expertise
+
+## Support
+
+If you encounter any issues or have suggestions:
+- Use the feedback form in the application
+- Open an issue in the repository
+- Contact the development team through Lovable
+
+## License
+
+This project is licensed under standard open-source terms. See the LICENSE file for details.
+
+## Acknowledgments
+
+- The Ibeno community for their cultural and linguistic contributions
+- Contributors to the translation dataset
+- Lovable for development support
