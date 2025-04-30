@@ -1,19 +1,15 @@
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Book, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-
 interface HeaderProps {
   onSidebarToggle: () => void;
 }
-
 const Header = ({
   onSidebarToggle
 }: HeaderProps) => {
   const isMobile = useIsMobile();
-
   return <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-400 text-white py-3 sm:py-4 px-4 sm:px-6 shadow-lg sticky top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-2 sm:space-x-3">
@@ -30,7 +26,7 @@ const Header = ({
             <DialogTrigger asChild>
               <Button variant="ghost" size={isMobile ? "sm" : "default"} className="text-white hover:bg-white/10">
                 <Book className="mr-1.5" size={isMobile ? 18 : 20} />
-                <span className="hidden sm:inline">About Ibọnọ</span>
+                <span className="hidden sm:inline text-base">About Ibeno</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -126,5 +122,4 @@ const Header = ({
       </div>
     </header>;
 };
-
 export default Header;

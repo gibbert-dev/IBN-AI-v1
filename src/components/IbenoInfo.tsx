@@ -1,14 +1,10 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 const IbenoInfo = () => {
   const isMobile = useIsMobile();
-
-  return (
-    <div className="space-y-6 sm:space-y-8">
+  return <div className="space-y-6 sm:space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient mb-4">
           About the Ibọnọ Language
@@ -35,17 +31,10 @@ const IbenoInfo = () => {
             </ul>
           </CardContent>
           <CardFooter className="flex justify-center sm:justify-start gap-2 sm:gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              size={isMobile ? "sm" : "default"}
-              className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium"
-            >
+            <Button variant="outline" size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium">
               Learn More
             </Button>
-            <Button 
-              size={isMobile ? "sm" : "default"}
-              className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium bg-ibonai-green hover:bg-ibonai-green/90"
-            >
+            <Button size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium bg-ibonai-green hover:bg-ibonai-green/90">
               Resources
             </Button>
           </CardFooter>
@@ -66,17 +55,10 @@ const IbenoInfo = () => {
             </ul>
           </CardContent>
           <CardFooter className="flex justify-center sm:justify-start gap-2 sm:gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              size={isMobile ? "sm" : "default"}
-              className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium"
-            >
+            <Button variant="outline" size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium">
               Culture
             </Button>
-            <Button 
-              size={isMobile ? "sm" : "default"}
-              className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium bg-ibonai-blue hover:bg-ibonai-blue/90"
-            >
+            <Button size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium bg-ibonai-blue hover:bg-ibonai-blue/90">
               Community
             </Button>
           </CardFooter>
@@ -84,29 +66,10 @@ const IbenoInfo = () => {
       </div>
 
       <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-        <Button 
-          size={isMobile ? "lg" : "default"} 
-          className="w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-medium bg-gradient-to-r from-ibonai-green to-ibonai-lightGreen hover:opacity-90"
-        >
-          Join Translation Project
-        </Button>
-        <Button 
-          variant="outline"
-          size={isMobile ? "lg" : "default"} 
-          className="w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-medium border-ibonai-green text-ibonai-green hover:bg-ibonai-green/10"
-        >
-          Contribute Resources
-        </Button>
-        <Button 
-          variant="ghost"
-          size={isMobile ? "lg" : "default"} 
-          className="w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-medium text-ibonai-blue hover:bg-ibonai-blue/10"
-        >
-          Contact Team
-        </Button>
+        
+        
+        
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default IbenoInfo;
