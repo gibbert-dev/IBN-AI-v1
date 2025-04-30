@@ -3,9 +3,12 @@ import { Book, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import FeedbackDialog from "./FeedbackDialog";
+
 interface HeaderProps {
   onSidebarToggle: () => void;
 }
+
 const Header = ({
   onSidebarToggle
 }: HeaderProps) => {
@@ -118,8 +121,10 @@ const Header = ({
               </div>
             </DialogContent>
           </Dialog>
+          <FeedbackDialog />
         </div>
       </div>
     </header>;
 };
+
 export default Header;
