@@ -1,4 +1,3 @@
-
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
@@ -12,7 +11,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 const Index = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -23,9 +21,7 @@ const Index = () => {
       setIsOpen(false);
     }
   }, [isMobile]);
-  
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  return <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header onSidebarToggle={() => setIsOpen(!isOpen)} />
       
       <div className="flex-1 flex">
@@ -156,10 +152,7 @@ const Index = () => {
             <div className="space-y-5">
               <h3 className="text-lg font-semibold text-teal-200">Contact Us</h3>
               <div className="space-y-3 text-sm">
-                <p className="text-blue-100">
-                  <span className="block font-medium">Location:</span>
-                  Opp. Ibeno Student Library, Secretariat Rd, Upenekang, Ibeno L.G.A., Akwa Ibom State
-                </p>
+                
                 <p className="text-blue-100">
                   <span className="block font-medium">Email:</span>
                   <a href="mailto:robertsunday333@gmail.com" className="hover:text-white transition-colors">
@@ -187,13 +180,11 @@ const Index = () => {
             <div className="flex gap-6 flex-wrap justify-center">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <Button variant="link" size="sm" className="text-blue-200 hover:text-white p-0">Contact</Button>
+              
             </div>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;

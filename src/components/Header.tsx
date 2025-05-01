@@ -1,39 +1,24 @@
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Book, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import FeedbackDialog from "./FeedbackDialog";
-
 interface HeaderProps {
   onSidebarToggle: () => void;
 }
-
 const Header = ({
   onSidebarToggle
 }: HeaderProps) => {
   const isMobile = useIsMobile();
-  
-  return (
-    <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-400 text-white py-4 sm:py-5 px-5 sm:px-8 shadow-lg sticky top-0 z-10">
-      <div className="container mx-auto flex justify-between items-center">
+  return <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-400 text-white py-4 sm:py-5 px-5 sm:px-8 shadow-lg sticky top-0 z-10">
+      <div className="container mx-auto flex justify-between items-center px-0">
         <div className="flex items-center space-x-3 sm:space-x-4">
-          <button 
-            onClick={onSidebarToggle} 
-            className="p-2 sm:p-2.5 hover:bg-white/15 rounded-md transition-colors duration-200"
-            aria-label="Toggle Sidebar"
-          >
+          <button onClick={onSidebarToggle} className="p-2 sm:p-2.5 hover:bg-white/15 rounded-md transition-colors duration-200" aria-label="Toggle Sidebar">
             <Menu size={isMobile ? 22 : 24} className="opacity-95" />
           </button>
           
           <div className="flex items-center space-x-2.5 sm:space-x-3.5">
-            <img 
-              src={import.meta.env.BASE_URL + 'logo.png'} 
-              alt="IBN-AI Logo" 
-              className="h-10 w-10 sm:h-14 sm:w-14 object-contain filter drop-shadow-lg" 
-              loading="eager" 
-              draggable="false" 
-            />
+            <img src={import.meta.env.BASE_URL + 'logo.png'} alt="IBN-AI Logo" className="h-10 w-10 sm:h-14 sm:w-14 object-contain filter drop-shadow-lg" loading="eager" draggable="false" />
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide">IBN-AI</h1>
           </div>
         </div>
@@ -41,11 +26,7 @@ const Header = ({
         <div className="ml-auto flex items-center space-x-3 sm:space-x-5">
           <Dialog>
             <DialogTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size={isMobile ? "sm" : "default"} 
-                className="text-white hover:bg-white/15 transition-colors duration-200"
-              >
+              <Button variant="ghost" size={isMobile ? "sm" : "default"} className="text-white hover:bg-white/15 transition-colors duration-200">
                 <Book className="mr-2" size={isMobile ? 18 : 20} />
                 <span className="hidden sm:inline text-base">About Ibeno</span>
               </Button>
@@ -142,8 +123,6 @@ const Header = ({
           <FeedbackDialog />
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
