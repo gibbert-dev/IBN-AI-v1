@@ -107,31 +107,7 @@ const Index = () => {
             </div>
             
             {/* Column 2: Quick Links */}
-            <div className="space-y-5">
-              <h3 className="text-lg font-semibold text-teal-200">Resources</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <a href="#" className="text-blue-100 hover:text-white transition-colors flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">About the Project</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-100 hover:text-white transition-colors flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Translation Resources</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-100 hover:text-white transition-colors flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Contribute</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-100 hover:text-white transition-colors flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Dataset Information</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+            
             
             {/* Column 3: Community */}
             <div className="space-y-5">
