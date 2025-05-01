@@ -1,3 +1,4 @@
+
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
@@ -11,6 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 const Index = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -21,27 +23,29 @@ const Index = () => {
       setIsOpen(false);
     }
   }, [isMobile]);
-  return <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header onSidebarToggle={() => setIsOpen(!isOpen)} />
       
       <div className="flex-1 flex">
         {/* Main content */}
-        <main className="flex-1 container mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 animate-fade-in">
-          <div className="mb-8 sm:mb-12">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-4">IBN-AI</h1>
+        <main className="flex-1 container mx-auto py-8 sm:py-10 px-5 sm:px-8 animate-fade-in">
+          <div className="mb-10 sm:mb-14">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-6">IBN-AI</h1>
             <p className="text-gray-600 dark:text-gray-300 max-w-3xl text-base sm:text-lg leading-relaxed">
               Help build an Ibọnọ translation AI model by contributing English-Ibọnọ translation pairs. 
               Your contributions will help preserve and promote the Ibọnọ language for future generations.
             </p>
           </div>
 
-          <div className="card-enhanced p-5 sm:p-8 mb-8 sm:mb-12 transition-all">
-            <h2 className="text-xl sm:text-2xl font-semibold text-teal-800 dark:text-teal-400 mb-4 sm:mb-6">Contribute Translations</h2>
+          <div className="card-enhanced p-6 sm:p-8 mb-10 sm:mb-14 transition-all">
+            <h2 className="text-xl sm:text-2xl font-semibold text-teal-800 dark:text-teal-400 mb-6 sm:mb-8">Contribute Translations</h2>
             <TranslationForm />
           </div>
           
           {/* Ibeno Information Section */}
-          <div className="mt-8 sm:mt-16">
+          <div className="mt-10 sm:mt-16">
             <IbenoInfo />
           </div>
         </main>
@@ -188,6 +192,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
