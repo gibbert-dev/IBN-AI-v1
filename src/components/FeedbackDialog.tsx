@@ -28,7 +28,7 @@ const FeedbackDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-2">Feedback</Button>
+        <Button variant="secondary" size="sm" className="ml-2">Feedback</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
