@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,7 @@ const TranslationForm = () => {
       setIsSubmitting(false);
     }
   };
-
+  
   const addSpecialChar = (char: string) => {
     const ibonoTextarea = document.getElementById('ibono') as HTMLTextAreaElement;
     if (ibonoTextarea) {
@@ -73,20 +72,6 @@ const TranslationForm = () => {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="pt-6 space-y-6">
-          <div>
-            <label htmlFor="english" className="block text-sm font-medium mb-2">
-              English Text
-            </label>
-            <Textarea
-              id="english"
-              placeholder="Enter English text"
-              value={englishText}
-              onChange={(e) => setEnglishText(e.target.value)}
-              rows={4}
-              className="w-full text-lg"
-            />
-          </div>
-          
           <div>
             <label htmlFor="ibono" className="block text-sm font-medium mb-2">
               Ibọnọ Translation
@@ -142,6 +127,20 @@ const TranslationForm = () => {
                 ị
               </Button>
             </div>
+          </div>
+          
+          <div>
+            <label htmlFor="english" className="block text-sm font-medium mb-2">
+              English Text
+            </label>
+            <Textarea
+              id="english"
+              placeholder="Enter English text"
+              value={englishText}
+              onChange={(e) => setEnglishText(e.target.value)}
+              rows={4}
+              className="w-full text-lg"
+            />
           </div>
         </CardContent>
         <CardFooter className="flex justify-end border-t pt-6">
