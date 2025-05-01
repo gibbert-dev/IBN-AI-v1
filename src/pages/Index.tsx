@@ -11,7 +11,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 const Index = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -22,18 +21,14 @@ const Index = () => {
       setIsOpen(false);
     }
   }, [isMobile]);
-
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  return <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header onSidebarToggle={() => setIsOpen(!isOpen)} />
       
       <div className="flex-1 flex">
         {/* Main content */}
         <main className="flex-1 container mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 animate-fade-in">
           <div className="mb-8 sm:mb-12">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-4">
-              IBN-AI: Ibọnọ Translation Project
-            </h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-4">IBN-AI</h1>
             <p className="text-gray-600 dark:text-gray-300 max-w-3xl text-base sm:text-lg leading-relaxed">
               Help build an Ibọnọ translation AI model by contributing English-Ibọnọ translation pairs. 
               Your contributions will help preserve and promote the Ibọnọ language for future generations.
@@ -99,29 +94,13 @@ const Index = () => {
               
               {/* Social links */}
               <div className="flex space-x-5 pt-3">
-                <a 
-                  href="https://github.com/Josebert2001" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  aria-label="GitHub"
-                  className="text-blue-200 hover:text-white transition-colors"
-                >
+                <a href="https://github.com/Josebert2001" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-blue-200 hover:text-white transition-colors">
                   <Github size={20} />
                 </a>
-                <a 
-                  href="https://x.com/JosephR90978798?s=09" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  aria-label="Twitter"
-                  className="text-blue-200 hover:text-white transition-colors"
-                >
+                <a href="https://x.com/JosephR90978798?s=09" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-blue-200 hover:text-white transition-colors">
                   <Twitter size={20} />
                 </a>
-                <a 
-                  href="mailto:robertsunday333@gmail.com" 
-                  aria-label="Email"
-                  className="text-blue-200 hover:text-white transition-colors"
-                >
+                <a href="mailto:robertsunday333@gmail.com" aria-label="Email" className="text-blue-200 hover:text-white transition-colors">
                   <Mail size={20} />
                 </a>
               </div>
@@ -163,10 +142,7 @@ const Index = () => {
               <p className="text-blue-200 text-xs italic">
                 We are a people of strength, wisdom, and compassion — standing tall like the ocean that cradles our home.
               </p>
-              <a 
-                href="#" 
-                className="inline-flex items-center mt-2 text-teal-200 hover:text-white transition-colors text-sm group"
-              >
+              <a href="#" className="inline-flex items-center mt-2 text-teal-200 hover:text-white transition-colors text-sm group">
                 Learn more about Ibọnọ culture
                 <ExternalLink size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </a>
@@ -212,8 +188,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
