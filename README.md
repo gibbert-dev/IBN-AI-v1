@@ -1,5 +1,7 @@
 # IBN-AI: Ibọnọ Translation Project
 
+A project by JR Digital Insights
+
 ## About the Project
 
 IBN-AI is a community-driven initiative to develop AI translation tools for the Ibọnọ language, preserving linguistic heritage through modern technology. The project aims to create a comprehensive English-Ibọnọ translation system by collecting translation pairs and training machine learning models.
@@ -48,37 +50,34 @@ This project is built with:
 ### Installation
 
 1. Clone the repository:
-\`\`\`sh
+```sh
 git clone <YOUR_GIT_URL>
-\`\`\`
+```
 
 2. Navigate to the project directory:
-\`\`\`sh
+```sh
 cd <YOUR_PROJECT_NAME>
-\`\`\`
+```
 
 3. Install dependencies:
-\`\`\`sh
+```sh
 npm install
-\`\`\`
+```
 
 4. Start the development server:
-\`\`\`sh
+```sh
 npm run dev
-\`\`\`
+```
 
-## Development Options
+## Development
 
-### Using Lovable
-Visit the [Lovable Project](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) and start prompting. Changes are automatically committed.
+### Using Local IDE
+Clone the repository and push changes to your preferred Git hosting service.
 
 ### Using GitHub Codespaces
 1. Navigate to the repository's main page
 2. Click "Code" > "Codespaces" tab
 3. Click "New codespace"
-
-### Using Local IDE
-Clone the repository and push changes. Changes will reflect in Lovable.
 
 ## Deployment
 
@@ -100,15 +99,6 @@ The application will be automatically deployed and you'll receive a production U
 3. Add your custom domain
 4. Follow Vercel's DNS configuration instructions
 
-### Alternative Deployment Options
-
-Deploy through [Lovable](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) by clicking Share -> Publish.
-
-### Custom Domain Setup
-1. Navigate to Project > Settings > Domains
-2. Click Connect Domain
-3. Follow the [domain setup guide](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
-
 ## Contributing
 
 We welcome contributions from the community! You can help by:
@@ -120,9 +110,8 @@ We welcome contributions from the community! You can help by:
 ## Support
 
 If you encounter any issues or have suggestions:
-- Use the feedback form in the application
 - Open an issue in the repository
-- Contact the development team through Lovable
+- Contact the development team
 
 ## License
 
@@ -131,5 +120,5 @@ This project is licensed under standard open-source terms. See the LICENSE file 
 ## Acknowledgments
 
 - The Ibeno community for their cultural and linguistic contributions
+- JR Digital Insights development team
 - Contributors to the translation dataset
-- Lovable for development support

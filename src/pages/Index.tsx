@@ -178,7 +178,7 @@ const Index = () => {
           {/* Bottom section */}
           <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-blue-200">
             <div className="mb-4 sm:mb-0">
-              © {new Date().getFullYear()} IBN-AI Project. All rights reserved.
+              © {new Date().getFullYear()} IBN-AI Project by JR Digital Insights. All rights reserved.
             </div>
             <div className="flex gap-6 flex-wrap justify-center">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
