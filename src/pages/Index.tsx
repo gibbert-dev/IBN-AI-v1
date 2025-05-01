@@ -36,7 +36,7 @@ const Index = () => {
           </div>
 
           <div className="card-enhanced p-6 sm:p-8 mb-10 sm:mb-14 transition-all">
-            <h2 className="text-xl sm:text-2xl font-semibold text-teal-800 dark:text-teal-400 mb-6 sm:mb-8">Contribute Translations</h2>
+            <h2 className="sm:text-2xl mb-6 sm:mb-8 text-center text-slate-950 font-bold text-xl">Contribute Translations</h2>
             <TranslationForm />
           </div>
           
