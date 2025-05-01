@@ -54,14 +54,7 @@ const IbenoInfo = () => {
               <li>Important for community cohesion</li>
             </ul>
           </CardContent>
-          <CardFooter className="flex justify-center sm:justify-start gap-2 sm:gap-3 pt-4">
-            <Button variant="outline" size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium">
-              Culture
-            </Button>
-            <Button size={isMobile ? "sm" : "default"} className="min-w-20 sm:min-w-24 text-xs sm:text-sm font-medium bg-ibonai-blue hover:bg-ibonai-blue/90">
-              Community
-            </Button>
-          </CardFooter>
+          
         </Card>
       </div>
 
