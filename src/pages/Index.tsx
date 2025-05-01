@@ -1,4 +1,3 @@
-
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
@@ -10,7 +9,7 @@ import IbenoInfo from "@/components/IbenoInfo";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
-import { GitHub, Twitter, Mail, ExternalLink } from "lucide-react";
+import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
@@ -107,7 +106,7 @@ const Index = () => {
                   aria-label="GitHub"
                   className="text-blue-200 hover:text-white transition-colors"
                 >
-                  <GitHub size={20} />
+                  <Github size={20} />
                 </a>
                 <a 
                   href="https://x.com/JosephR90978798?s=09" 
