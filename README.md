@@ -82,6 +82,26 @@ Clone the repository and push changes. Changes will reflect in Lovable.
 
 ## Deployment
 
+### Vercel Deployment (Recommended)
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. Visit [Vercel](https://vercel.com) and sign in
+3. Click "New Project" and import your repository
+4. Configure the project:
+   - Framework Preset: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+5. Click "Deploy"
+
+The application will be automatically deployed and you'll receive a production URL. Vercel will automatically redeploy on every push to your main branch.
+
+### Custom Domain Setup on Vercel
+1. Go to your project settings in Vercel
+2. Navigate to the "Domains" section
+3. Add your custom domain
+4. Follow Vercel's DNS configuration instructions
+
+### Alternative Deployment Options
+
 Deploy through [Lovable](https://lovable.dev/projects/a7021095-b2fe-45fd-b440-940d5634c9bc) by clicking Share -> Publish.
 
 ### Custom Domain Setup
