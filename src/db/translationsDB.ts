@@ -1,23 +1,23 @@
-import Dexie, { Table } from "dexie";
+import Dexie, { Table } from 'dexie';
 
 export interface Translation {
     id?: number;
-    text: string;
-    translation: string;
-    createdAt: number;
-    updatedAt: number;
-    synced: number; // 0 = not synced, 1 = synced
+    text: string;          // maps to english in Supabase
+    translation: string;   // maps to ibono in Supabase
+    createdAt: number;     // stored as timestamp locally
+    updatedAt: number;     // stored as timestamp locally
+    synced: number;        // 0 = not synced, 1 = synced
 }
 
-export class TranslationsDB extends Dexie {
-    translations!: Table<Translation, number>;
+export class TranslationsDatabase extends Dexie {
+    translations!: Table<Translation>;
 
     constructor() {
-        super("TranslationsDB");
-        this.version(2).stores({
-            translations: "++id, text, updatedAt, synced"
+        super('TranslationsDB');
+        this.version(1).stores({
+            translations: '++id, text, translation, createdAt, updatedAt, synced'
         });
     }
 }
 
-export const db = new TranslationsDB();
+export const db = new TranslationsDatabase();

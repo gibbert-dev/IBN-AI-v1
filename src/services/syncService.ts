@@ -6,19 +6,33 @@ async function syncWithServer(translation: Translation) {
         const { data, error } = await supabase
             .from('translations')
             .upsert({
-                text: translation.text,
-                translation: translation.translation,
+                english: translation.text,
+                ibono: translation.translation,
                 created_at: new Date(translation.createdAt).toISOString(),
                 updated_at: new Date(translation.updatedAt).toISOString()
             });
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase error details:", {
+                message: error.message,
+                details: error.details,
+                hint: error.hint
+            });
+            throw error;
+        }
 
         // Mark as synced in local DB
         await db.translations.where('id').equals(translation.id!).modify({ synced: 1 });
         return data;
     } catch (err) {
-        console.error("Error syncing translation:", err);
+        console.error("Error syncing translation:", {
+            error: err,
+            translation: {
+                id: translation.id,
+                text: translation.text,
+                translation: translation.translation
+            }
+        });
         throw err;
     }
 }
@@ -49,11 +63,17 @@ async function syncPendingTranslations() {
             .equals(0)
             .toArray();
 
+        console.log(`Found ${pendingTranslations.length} translations to sync`);
+
         for (const translation of pendingTranslations) {
             try {
                 await syncWithServer(translation);
+                console.log(`Successfully synced translation ID: ${translation.id}`);
             } catch (err) {
-                console.error("Error syncing translation:", translation, err);
+                console.error("Error syncing translation:", {
+                    translationId: translation.id,
+                    error: err
+                });
             }
         }
     } catch (err) {
