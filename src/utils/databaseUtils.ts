@@ -14,25 +14,25 @@ const TABLE_NAME = "translations";
 export const findExistingTranslation = async (english: string, ibono: string): Promise<Translation | null> => {
   try {
     // Check for exact match (both English and Ibọnọ)
-    const { data, error } = await supabase
+    const { data: exactMatch, error: exactError } = await supabase
       .from(TABLE_NAME)
       .select('*')
-      .eq('english', english)
-      .eq('ibono', ibono)
+      .eq('english', english.trim())
+      .eq('ibono', ibono.trim())
       .single();
       
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
-      console.error("Error checking for existing translation:", error);
-      throw error;
+    if (exactError && exactError.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+      console.error("Error checking for existing translation:", exactError);
+      throw exactError;
     }
     
-    if (data) return data as Translation;
+    if (exactMatch) return exactMatch as Translation;
 
     // If no exact match, check for matching English text only
     const { data: englishMatch, error: englishError } = await supabase
       .from(TABLE_NAME)
       .select('*')
-      .eq('english', english)
+      .eq('english', english.trim())
       .maybeSingle();
       
     if (englishError && englishError.code !== 'PGRST116') {
@@ -51,10 +51,15 @@ export const findExistingTranslation = async (english: string, ibono: string): P
 
 export const saveTranslation = async (english: string, ibono: string): Promise<{ data: Translation | null; isDuplicate: boolean; existingTranslation: Translation | null }> => {
   try {
+    // Trim inputs to avoid whitespace-only differences
+    const trimmedEnglish = english.trim();
+    const trimmedIbono = ibono.trim();
+    
     // First check if this translation already exists
-    const existingTranslation = await findExistingTranslation(english, ibono);
+    const existingTranslation = await findExistingTranslation(trimmedEnglish, trimmedIbono);
     
     if (existingTranslation) {
+      console.log("Found duplicate:", existingTranslation);
       return { 
         data: null, 
         isDuplicate: true, 
@@ -63,8 +68,8 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
     }
     
     const newTranslation = {
-      english,
-      ibono,
+      english: trimmedEnglish,
+      ibono: trimmedIbono,
       // Supabase will handle the created_at timestamp automatically
     };
     

@@ -8,6 +8,9 @@ import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Info } from "lucide-react";
 
+// Characters commonly found in English but not in Ibọnọ language
+const ENGLISH_INDICATORS = ['w', 'c', 'q', 'x', 'z', 'j', 'v'];
+
 const TranslationForm = () => {
   const [englishText, setEnglishText] = useState("");
   const [ibonoText, setIbonoText] = useState("");
@@ -16,6 +19,39 @@ const TranslationForm = () => {
     type: 'exact' | 'english',
     translation: { english: string, ibono: string }
   } | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Check if text appears to be English
+  const detectEnglishInIbono = (text: string): boolean => {
+    if (!text.trim()) return false;
+    
+    // Check for common English words
+    const commonEnglishWords = ['the', 'and', 'this', 'that', 'with', 'for', 'from', 'have', 'who'];
+    const words = text.toLowerCase().split(/\s+/);
+    
+    // Check for English-specific characters
+    const hasEnglishChars = ENGLISH_INDICATORS.some(char => text.toLowerCase().includes(char));
+    
+    // Check for common English words
+    const hasEnglishWords = commonEnglishWords.some(word => 
+      words.includes(word) || words.some(w => w === word+'.' || w === word+',' || w === word+'!')
+    );
+    
+    // If the text has multiple indicators of being English, flag it
+    return (hasEnglishChars && text.length > 5) || hasEnglishWords;
+  };
+
+  const handleIbonoChange = (text: string) => {
+    setIbonoText(text);
+    setValidationError(null);
+    
+    if (duplicateAlert) setDuplicateAlert(null);
+    
+    // Check if the input appears to be English
+    if (detectEnglishInIbono(text)) {
+      setValidationError("This appears to be English text. Please enter Ibọnọ language text.");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +65,28 @@ const TranslationForm = () => {
       return;
     }
     
+    // Check for English in Ibọnọ field
+    if (detectEnglishInIbono(ibonoText)) {
+      setValidationError("This appears to be English text. Please enter Ibọnọ language text.");
+      toast({
+        title: "Validation Error",
+        description: "The Ibọnọ field appears to contain English text.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     setDuplicateAlert(null);
     
     try {
+      console.log("Saving translation:", { englishText, ibonoText });
       const result = await saveTranslation(englishText, ibonoText);
+      console.log("Save result:", result);
       
       if (result.isDuplicate && result.existingTranslation) {
         // Check if it's an exact match or just the English text match
-        const isExactMatch = result.existingTranslation.ibono === ibonoText;
+        const isExactMatch = result.existingTranslation.ibono.trim().toLowerCase() === ibonoText.trim().toLowerCase();
         
         setDuplicateAlert({
           type: isExactMatch ? 'exact' : 'english',
@@ -52,7 +101,7 @@ const TranslationForm = () => {
           description: isExactMatch 
             ? "This exact translation already exists in the database." 
             : "A different translation for this English text already exists.",
-          variant: "default"
+          variant: "destructive"
         });
       } else {
         toast({
@@ -65,6 +114,7 @@ const TranslationForm = () => {
         setIbonoText("");
       }
     } catch (error) {
+      console.error("Error saving translation:", error);
       toast({
         title: "Error",
         description: "Failed to save translation. Please try again.",
@@ -132,13 +182,20 @@ const TranslationForm = () => {
               id="ibono"
               placeholder="Enter Ibọnọ translation"
               value={ibonoText}
-              onChange={(e) => {
-                setIbonoText(e.target.value);
-                if (duplicateAlert) setDuplicateAlert(null);
-              }}
+              onChange={(e) => handleIbonoChange(e.target.value)}
               rows={4}
-              className={`w-full text-lg ${duplicateAlert?.type === 'exact' ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
+              className={`w-full text-lg ${
+                validationError 
+                  ? 'border-red-500 focus-visible:ring-red-500' 
+                  : duplicateAlert?.type === 'exact' 
+                    ? 'border-amber-500 focus-visible:ring-amber-500' 
+                    : ''
+              }`}
             />
+            
+            {validationError && (
+              <p className="mt-2 text-sm text-red-600">{validationError}</p>
+            )}
             
             <div className="mt-2 flex flex-wrap gap-2">
               <Button 
@@ -204,7 +261,7 @@ const TranslationForm = () => {
         <CardFooter className="flex justify-end border-t pt-6">
           <Button 
             type="submit" 
-            disabled={isSubmitting}
+            disabled={isSubmitting || !!validationError}
             size="lg"
             className="bg-ibonai-orange hover:bg-ibonai-orange/90 text-lg px-8"
           >
