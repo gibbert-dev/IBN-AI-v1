@@ -1,7 +1,7 @@
+
 import { useState } from "react";
 import { saveTranslation } from "@/utils/databaseUtils";
 import { toast } from "@/components/ui/use-toast";
-import { db } from "@/db/translationsDB";
 
 // Import our new components
 import DuplicateTranslationAlert from "./translation/DuplicateTranslationAlert";
@@ -67,54 +67,36 @@ const TranslationForm = () => {
     setDuplicateAlert(null);
     
     try {
-      if (navigator.onLine) {
-        // Try online save first
-        const result = await saveTranslation(englishText, ibonoText);
+      console.log("Saving translation:", { englishText, ibonoText });
+      const result = await saveTranslation(englishText, ibonoText);
+      console.log("Save result:", result);
+      
+      if (result.isDuplicate && result.existingTranslation) {
+        // Check if it's an exact match or just the English text match
+        const isExactMatch = result.existingTranslation.ibono.trim().toLowerCase() === ibonoText.trim().toLowerCase();
         
-        if (result.isDuplicate && result.existingTranslation) {
-          const isExactMatch = result.existingTranslation.ibono.trim().toLowerCase() === ibonoText.trim().toLowerCase();
-          
-          setDuplicateAlert({
-            type: isExactMatch ? 'exact' : 'english',
-            translation: {
-              english: result.existingTranslation.english,
-              ibono: result.existingTranslation.ibono
-            }
-          });
-          
-          toast({
-            title: "Duplicate Translation",
-            description: isExactMatch 
-              ? "This exact translation already exists in the database." 
-              : "A different translation for this English text already exists.",
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Success!",
-            description: "Translation saved to the database.",
-          });
-          
-          // Clear the form only on success
-          setEnglishText("");
-          setIbonoText("");
-        }
-      } else {
-        // Save locally when offline
-        await db.translations.add({
-          text: englishText,
-          translation: ibonoText,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          synced: 0  // 0 means unsynced
+        setDuplicateAlert({
+          type: isExactMatch ? 'exact' : 'english',
+          translation: {
+            english: result.existingTranslation.english,
+            ibono: result.existingTranslation.ibono
+          }
         });
-
+        
         toast({
-          title: "Saved Offline",
-          description: "Translation saved locally. Will sync when online.",
+          title: "Duplicate Translation",
+          description: isExactMatch 
+            ? "This exact translation already exists in the database." 
+            : "A different translation for this English text already exists.",
+          variant: "destructive"
         });
-
-        // Clear the form
+      } else {
+        toast({
+          title: "Success!",
+          description: "Translation saved to the database.",
+        });
+        
+        // Clear the form only on success
         setEnglishText("");
         setIbonoText("");
       }

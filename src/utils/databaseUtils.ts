@@ -1,12 +1,11 @@
+
 import { supabase } from './supabaseClient';
-import { db } from '../db/translationsDB';
 
 export interface Translation {
   id: number;
   english: string;
   ibono: string;
   created_at?: string; // Using created_at instead of timestamp as it's likely Supabase's default
-  updated_at?: string;
 }
 
 // Table name in Supabase
@@ -71,8 +70,7 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
     const newTranslation = {
       english: trimmedEnglish,
       ibono: trimmedIbono,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      // Supabase will handle the created_at timestamp automatically
     };
     
     const { data, error } = await supabase
@@ -126,45 +124,6 @@ export const getTranslations = async (): Promise<Translation[]> => {
   }
 };
 
-export const fetchTranslations = async () => {
-  try {
-    if (navigator.onLine) {
-      // Fetch from Supabase
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Clear and update local DB with fetched data, marking them as synced (1)
-      await db.translations.clear();
-      await db.translations.bulkAdd(
-        data.map((item: any) => ({
-          text: item.english,
-          translation: item.ibono,
-          createdAt: new Date(item.created_at).getTime(),
-          updatedAt: new Date(item.updated_at).getTime(),
-          synced: 1  // Use 1 to indicate synced
-        }))
-      );
-      return data;
-    } else {
-      // When offline, return local translations
-      const localData = await db.translations.toArray();
-      return localData.map(item => ({
-        english: item.text,
-        ibono: item.translation,
-        created_at: new Date(item.createdAt).toISOString(),
-        updated_at: new Date(item.updatedAt).toISOString()
-      }));
-    }
-  } catch (e) {
-    console.error("Error fetching translations:", e);
-    throw e;
-  }
-};
-
 export const deleteTranslation = async (id: number): Promise<void> => {
   const { error } = await supabase
     .from(TABLE_NAME)
@@ -197,8 +156,7 @@ export const exportTranslationsAsJSON = async (): Promise<string> => {
       id: t.id,
       english: t.english,
       ibono: t.ibono,
-      created_at: t.created_at || null,
-      updated_at: t.updated_at || null
+      created_at: t.created_at || null
     }));
     return JSON.stringify(cleanData, null, 2);
   } catch (error) {
@@ -211,9 +169,9 @@ export const exportTranslationsAsCSV = async (): Promise<string> => {
   const translations = await getTranslations();
   if (translations.length === 0) return "";
   
-  const headers = "id,english,ibono,created_at,updated_at\n";
+  const headers = "id,english,ibono,created_at\n";
   const rows = translations.map(t => 
-    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.created_at || ''},${t.updated_at || ''}`
+    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.created_at || ''}`
   ).join("\n");
   
   return headers + rows;

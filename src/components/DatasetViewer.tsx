@@ -1,43 +1,23 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { fetchTranslations, deleteTranslation, clearAllTranslations, exportTranslationsAsJSON, exportTranslationsAsCSV } from "@/utils/databaseUtils";
+import { getTranslations, deleteTranslation, clearAllTranslations, exportTranslationsAsJSON, exportTranslationsAsCSV, Translation } from "@/utils/databaseUtils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
-import { X, CloudOff, RefreshCw } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-
-interface Translation {
-  id: number;
-  english: string;
-  ibono: string;
-  synced?: boolean;
-}
+import { X } from "lucide-react";
 
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<Translation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
   
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
     loadTranslations();
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, []);
   
   const loadTranslations = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchTranslations();
+      const data = await getTranslations();
       setTranslations(data);
     } catch (error) {
       console.error("Error fetching translations:", error);
@@ -53,15 +33,6 @@ const DatasetViewer = () => {
   
   const handleDelete = async (id: number) => {
     try {
-      if (!isOnline) {
-        toast({
-          title: "Offline Mode",
-          description: "Deletions are not available while offline.",
-          variant: "destructive"
-        });
-        return;
-      }
-
       await deleteTranslation(id);
       await loadTranslations();
       toast({
@@ -78,15 +49,6 @@ const DatasetViewer = () => {
   };
   
   const handleClearAll = async () => {
-    if (!isOnline) {
-      toast({
-        title: "Offline Mode",
-        description: "Clear all is not available while offline.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (window.confirm("Are you sure you want to delete all translations? This cannot be undone.")) {
       try {
         await clearAllTranslations();
@@ -104,10 +66,6 @@ const DatasetViewer = () => {
       }
     }
   };
-
-  const handleRefresh = () => {
-    loadTranslations();
-  };
   
   const handleExportJSON = async () => {
     if (translations.length === 0) {
@@ -121,6 +79,8 @@ const DatasetViewer = () => {
     
     try {
       const jsonData = await exportTranslationsAsJSON();
+      // Validate that the JSON is parseable before creating blob
+      JSON.parse(jsonData); // This will throw if invalid
       const blob = new Blob([jsonData], { 
         type: "application/json;charset=utf-8"
       });
@@ -142,7 +102,7 @@ const DatasetViewer = () => {
       console.error("JSON export error:", error);
       toast({
         title: "Export failed",
-        description: "Failed to export data.",
+        description: error instanceof Error ? error.message : "Failed to export data.",
         variant: "destructive"
       });
     }
@@ -186,23 +146,11 @@ const DatasetViewer = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            Translation Dataset
-            {!isOnline && (
-              <Badge variant="secondary" className="gap-1">
-                <CloudOff className="h-3 w-3" /> Offline
-              </Badge>
-            )}
-          </CardTitle>
-          <CardDescription>
-            {translations.length} entries collected
-          </CardDescription>
-        </div>
-        <Button variant="ghost" size="icon" onClick={handleRefresh}>
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+      <CardHeader>
+        <CardTitle>Translation Dataset</CardTitle>
+        <CardDescription>
+          {translations.length} entries collected
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -216,7 +164,6 @@ const DatasetViewer = () => {
                 <TableRow>
                   <TableHead>English</TableHead>
                   <TableHead>Ibọnọ</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -226,17 +173,11 @@ const DatasetViewer = () => {
                     <TableCell className="font-medium">{item.english}</TableCell>
                     <TableCell>{item.ibono}</TableCell>
                     <TableCell>
-                      {item.synced === false ? (
-                        <Badge variant="secondary">Pending Sync</Badge>
-                      ) : null}
-                    </TableCell>
-                    <TableCell>
                       <Button 
                         variant="ghost" 
                         size="icon"
                         onClick={() => handleDelete(item.id)}
                         className="h-8 w-8"
-                        disabled={!isOnline}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -257,7 +198,7 @@ const DatasetViewer = () => {
           <Button 
             variant="destructive" 
             onClick={handleClearAll}
-            disabled={translations.length === 0 || !isOnline}
+            disabled={translations.length === 0}
           >
             Clear All
           </Button>
