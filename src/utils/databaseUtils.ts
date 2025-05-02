@@ -1,3 +1,4 @@
+
 import { supabase } from './supabaseClient';
 
 export interface Translation {
@@ -10,14 +11,63 @@ export interface Translation {
 // Table name in Supabase
 const TABLE_NAME = "translations";
 
-export const saveTranslation = async (english: string, ibono: string): Promise<Translation> => {
-  const newTranslation = {
-    english,
-    ibono,
-    // Supabase will handle the created_at timestamp automatically
-  };
-  
+export const findExistingTranslation = async (english: string, ibono: string): Promise<Translation | null> => {
   try {
+    // Check for exact match (both English and Ibọnọ)
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .eq('english', english)
+      .eq('ibono', ibono)
+      .single();
+      
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+      console.error("Error checking for existing translation:", error);
+      throw error;
+    }
+    
+    if (data) return data as Translation;
+
+    // If no exact match, check for matching English text only
+    const { data: englishMatch, error: englishError } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .eq('english', english)
+      .maybeSingle();
+      
+    if (englishError && englishError.code !== 'PGRST116') {
+      console.error("Error checking for existing English translation:", englishError);
+      throw englishError;
+    }
+    
+    if (englishMatch) return englishMatch as Translation;
+    
+    return null;
+  } catch (e) {
+    console.error("Unexpected error during duplicate check:", e);
+    throw e;
+  }
+};
+
+export const saveTranslation = async (english: string, ibono: string): Promise<{ data: Translation | null; isDuplicate: boolean; existingTranslation: Translation | null }> => {
+  try {
+    // First check if this translation already exists
+    const existingTranslation = await findExistingTranslation(english, ibono);
+    
+    if (existingTranslation) {
+      return { 
+        data: null, 
+        isDuplicate: true, 
+        existingTranslation 
+      };
+    }
+    
+    const newTranslation = {
+      english,
+      ibono,
+      // Supabase will handle the created_at timestamp automatically
+    };
+    
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .insert([newTranslation])
@@ -34,7 +84,11 @@ export const saveTranslation = async (english: string, ibono: string): Promise<T
       throw error;
     }
     
-    return data as Translation;
+    return { 
+      data: data as Translation, 
+      isDuplicate: false, 
+      existingTranslation: null 
+    };
   } catch (e) {
     console.error("Unexpected error during save:", e);
     throw e;

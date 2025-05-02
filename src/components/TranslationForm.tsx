@@ -1,14 +1,21 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { saveTranslation } from "@/utils/databaseUtils";
 import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Info } from "lucide-react";
 
 const TranslationForm = () => {
   const [englishText, setEnglishText] = useState("");
   const [ibonoText, setIbonoText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [duplicateAlert, setDuplicateAlert] = useState<{
+    type: 'exact' | 'english',
+    translation: { english: string, ibono: string }
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,17 +30,40 @@ const TranslationForm = () => {
     }
     
     setIsSubmitting(true);
+    setDuplicateAlert(null);
     
     try {
-      await saveTranslation(englishText, ibonoText);
-      toast({
-        title: "Success!",
-        description: "Translation saved to the database.",
-      });
+      const result = await saveTranslation(englishText, ibonoText);
       
-      // Clear the form
-      setEnglishText("");
-      setIbonoText("");
+      if (result.isDuplicate && result.existingTranslation) {
+        // Check if it's an exact match or just the English text match
+        const isExactMatch = result.existingTranslation.ibono === ibonoText;
+        
+        setDuplicateAlert({
+          type: isExactMatch ? 'exact' : 'english',
+          translation: {
+            english: result.existingTranslation.english,
+            ibono: result.existingTranslation.ibono
+          }
+        });
+        
+        toast({
+          title: "Duplicate Translation",
+          description: isExactMatch 
+            ? "This exact translation already exists in the database." 
+            : "A different translation for this English text already exists.",
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Translation saved to the database.",
+        });
+        
+        // Clear the form only on success
+        setEnglishText("");
+        setIbonoText("");
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -72,6 +102,28 @@ const TranslationForm = () => {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="pt-6 space-y-6">
+          {duplicateAlert && (
+            <Alert variant="default" className={`${
+              duplicateAlert.type === 'exact' 
+                ? 'border-amber-500 bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'
+                : 'border-blue-500 bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+            }`}>
+              {duplicateAlert.type === 'exact' 
+                ? <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                : <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
+              <AlertTitle className="font-medium">
+                {duplicateAlert.type === 'exact' 
+                  ? "Duplicate Translation Detected" 
+                  : "Similar Translation Found"}
+              </AlertTitle>
+              <AlertDescription className="mt-2 text-sm">
+                {duplicateAlert.type === 'exact' 
+                  ? "This exact English-Ibọnọ pair already exists in the database."
+                  : `This English text already has a translation: "${duplicateAlert.translation.ibono}"`}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div>
             <label htmlFor="ibono" className="block text-sm font-medium mb-2">
               Ibọnọ Translation
@@ -80,9 +132,12 @@ const TranslationForm = () => {
               id="ibono"
               placeholder="Enter Ibọnọ translation"
               value={ibonoText}
-              onChange={(e) => setIbonoText(e.target.value)}
+              onChange={(e) => {
+                setIbonoText(e.target.value);
+                if (duplicateAlert) setDuplicateAlert(null);
+              }}
               rows={4}
-              className="w-full text-lg"
+              className={`w-full text-lg ${duplicateAlert?.type === 'exact' ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
             />
             
             <div className="mt-2 flex flex-wrap gap-2">
@@ -137,9 +192,12 @@ const TranslationForm = () => {
               id="english"
               placeholder="Enter English text"
               value={englishText}
-              onChange={(e) => setEnglishText(e.target.value)}
+              onChange={(e) => {
+                setEnglishText(e.target.value);
+                if (duplicateAlert) setDuplicateAlert(null);
+              }}
               rows={4}
-              className="w-full text-lg"
+              className={`w-full text-lg ${duplicateAlert ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
             />
           </div>
         </CardContent>
