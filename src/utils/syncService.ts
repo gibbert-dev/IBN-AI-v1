@@ -1,7 +1,7 @@
 /**
  * Synchronization service for offline/online syncing
  */
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner"; // Changed from "@/components/ui/sonner" to direct "sonner" import
 import { 
   addLocalTranslation, 
   addToSyncQueue, 
@@ -32,9 +32,8 @@ export const setupNetworkListeners = () => {
     console.log('Application is online');
   } else {
     console.log('Application is offline');
-    toast({
-      title: "You're offline",
-      description: "Working in offline mode. Your translations will be synced when you reconnect.",
+    toast("You're offline", {
+      description: "Working in offline mode. Your translations will be synced when you reconnect."
     });
   }
 };
@@ -49,23 +48,20 @@ const handleOnline = async () => {
   isOnline = true;
   console.log('Connection restored. Starting sync...');
   
-  toast({
-    title: "You're back online",
-    description: "Syncing your translations...",
+  toast("You're back online", {
+    description: "Syncing your translations..."
   });
   
   try {
     await syncWithServer();
     
-    toast({
-      title: "Sync complete",
-      description: "Your translations have been synced with the server.",
+    toast("Sync complete", {
+      description: "Your translations have been synced with the server."
     });
   } catch (error) {
     console.error('Sync error:', error);
     
-    toast({
-      title: "Sync failed",
+    toast("Sync failed", {
       description: "There was an error syncing your translations. Will retry later.",
       variant: "destructive"
     });
@@ -77,9 +73,8 @@ const handleOffline = () => {
   isOnline = false;
   console.log('Connection lost. Working offline.');
   
-  toast({
-    title: "You're offline",
-    description: "Working in offline mode. Your translations will be synced when you reconnect.",
+  toast("You're offline", {
+    description: "Working in offline mode. Your translations will be synced when you reconnect."
   });
 };
 
