@@ -1,14 +1,13 @@
 
 import { useState } from "react";
-import { saveTranslation } from "@/utils/databaseUtils";
 import { toast } from "@/components/ui/use-toast";
-
-// Import our new components
+import { saveTranslation } from "@/utils/syncService"; // Changed to use syncService
 import DuplicateTranslationAlert from "./translation/DuplicateTranslationAlert";
 import IbonoTextArea from "./translation/IbonoTextArea";
 import EnglishTextArea from "./translation/EnglishTextArea";
 import TranslationFormContainer from "./translation/TranslationFormContainer";
 import useEnglishDetection from "@/hooks/useEnglishDetection";
+import { useOfflineStatus } from "@/context/OfflineContext";
 
 const TranslationForm = () => {
   const [englishText, setEnglishText] = useState("");
@@ -20,7 +19,8 @@ const TranslationForm = () => {
   } | null>(null);
   
   const { validateIbonoInput, validationError, setValidationError } = useEnglishDetection();
-
+  const { isOnline } = useOfflineStatus();
+  
   const handleIbonoChange = (text: string) => {
     setIbonoText(text);
     setValidationError(null);
@@ -73,7 +73,8 @@ const TranslationForm = () => {
       
       if (result.isDuplicate && result.existingTranslation) {
         // Check if it's an exact match or just the English text match
-        const isExactMatch = result.existingTranslation.ibono.trim().toLowerCase() === ibonoText.trim().toLowerCase();
+        const isExactMatch = 
+          result.existingTranslation.ibono.trim().toLowerCase() === ibonoText.trim().toLowerCase();
         
         setDuplicateAlert({
           type: isExactMatch ? 'exact' : 'english',
@@ -93,7 +94,9 @@ const TranslationForm = () => {
       } else {
         toast({
           title: "Success!",
-          description: "Translation saved to the database.",
+          description: isOnline 
+            ? "Translation saved to the database." 
+            : "Translation saved locally and will be synced when you're online.",
         });
         
         // Clear the form only on success
@@ -117,6 +120,7 @@ const TranslationForm = () => {
       isSubmitting={isSubmitting} 
       onSubmit={handleSubmit}
       isSubmitDisabled={!!validationError}
+      showOfflineIndicator={true}
     >
       {duplicateAlert && (
         <DuplicateTranslationAlert 

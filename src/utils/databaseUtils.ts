@@ -1,5 +1,6 @@
 
 import { supabase } from './supabaseClient';
+import { LocalTranslation } from './indexedDbService';
 
 export interface Translation {
   id: number;
@@ -49,7 +50,11 @@ export const findExistingTranslation = async (english: string, ibono: string): P
   }
 };
 
-export const saveTranslation = async (english: string, ibono: string): Promise<{ data: Translation | null; isDuplicate: boolean; existingTranslation: Translation | null }> => {
+export const saveTranslation = async (english: string, ibono: string): Promise<{ 
+  data: Translation | null; 
+  isDuplicate: boolean; 
+  existingTranslation: Translation | null 
+}> => {
   try {
     // Trim inputs to avoid whitespace-only differences
     const trimmedEnglish = english.trim();
@@ -175,4 +180,26 @@ export const exportTranslationsAsCSV = async (): Promise<string> => {
   ).join("\n");
   
   return headers + rows;
+};
+
+// Helper function to convert LocalTranslation to Translation
+export const localToRemote = (local: LocalTranslation): Translation => {
+  return {
+    id: local.id || 0, // Default to 0 for new entries
+    english: local.english,
+    ibono: local.ibono,
+    created_at: local.created_at
+  };
+};
+
+// Helper function to convert Translation to LocalTranslation
+export const remoteToLocal = (remote: Translation): LocalTranslation => {
+  return {
+    id: remote.id,
+    english: remote.english,
+    ibono: remote.ibono,
+    created_at: remote.created_at,
+    is_synced: true,
+    sync_status: 'synced'
+  };
 };
