@@ -61,9 +61,8 @@ const handleOnline = async () => {
   } catch (error) {
     console.error('Sync error:', error);
     
-    toast("Sync failed", {
-      description: "There was an error syncing your translations. Will retry later.",
-      variant: "destructive"
+    toast.error("Sync failed", {
+      description: "There was an error syncing your translations. Will retry later."
     });
   }
 };
