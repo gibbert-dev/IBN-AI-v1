@@ -18,7 +18,14 @@ const TranslationForm = () => {
     translation: { english: string, ibono: string }
   } | null>(null);
   
-  const { validateIbonoInput, validationError, setValidationError } = useEnglishDetection();
+  const { 
+    validateIbonoInput, 
+    validateEnglishInput, 
+    validationError, 
+    setValidationError 
+  } = useEnglishDetection();
+  
+  const [englishValidationError, setEnglishValidationError] = useState<string | null>(null);
   const { isOnline } = useOfflineStatus();
   
   const handleIbonoChange = (text: string) => {
@@ -27,7 +34,7 @@ const TranslationForm = () => {
     
     if (duplicateAlert) setDuplicateAlert(null);
     
-    // Check if the input appears to be English
+    // Check if the input appears to be English and for repeated words
     const error = validateIbonoInput(text);
     if (error) {
       setValidationError(error);
@@ -36,7 +43,15 @@ const TranslationForm = () => {
 
   const handleEnglishChange = (text: string) => {
     setEnglishText(text);
+    setEnglishValidationError(null);
+    
     if (duplicateAlert) setDuplicateAlert(null);
+    
+    // Check for repeated words in English text
+    const error = validateEnglishInput(text);
+    if (error) {
+      setEnglishValidationError(error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,12 +67,24 @@ const TranslationForm = () => {
     }
     
     // Check for English in Ibọnọ field
-    const error = validateIbonoInput(ibonoText);
-    if (error) {
-      setValidationError(error);
+    const ibonoError = validateIbonoInput(ibonoText);
+    if (ibonoError) {
+      setValidationError(ibonoError);
       toast({
         title: "Validation Error",
-        description: "The Ibọnọ field appears to contain English text.",
+        description: ibonoError,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Check for repeated words in English text
+    const englishError = validateEnglishInput(englishText);
+    if (englishError) {
+      setEnglishValidationError(englishError);
+      toast({
+        title: "Validation Error",
+        description: englishError,
         variant: "destructive"
       });
       return;
@@ -119,7 +146,7 @@ const TranslationForm = () => {
     <TranslationFormContainer 
       isSubmitting={isSubmitting} 
       onSubmit={handleSubmit}
-      isSubmitDisabled={!!validationError}
+      isSubmitDisabled={!!validationError || !!englishValidationError}
       showOfflineIndicator={true}
     >
       {duplicateAlert && (
@@ -140,6 +167,7 @@ const TranslationForm = () => {
         value={englishText}
         onChange={handleEnglishChange}
         hasDuplicateAlert={!!duplicateAlert}
+        validationError={englishValidationError}
       />
     </TranslationFormContainer>
   );

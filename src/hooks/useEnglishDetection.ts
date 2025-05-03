@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { detectRepeatedWords } from "@/utils/textValidation";
 
 // Characters commonly found in English but not in Ibọnọ language
 const ENGLISH_INDICATORS = ['w', 'c', 'q', 'x', 'z', 'j', 'v'];
@@ -27,13 +28,36 @@ export const useEnglishDetection = () => {
   };
 
   const validateIbonoInput = (text: string): string | null => {
+    // First check for English text
     if (detectEnglishInIbono(text)) {
       return "This appears to be English text. Please enter Ibọnọ language text.";
     }
+
+    // Then check for repeated words
+    const { hasRepeatedWords, repeatedWord } = detectRepeatedWords(text);
+    if (hasRepeatedWords) {
+      return `Repeated word detected: "${repeatedWord}". Please check your translation.`;
+    }
+
     return null;
   };
 
-  return { validateIbonoInput, setValidationError, validationError };
+  const validateEnglishInput = (text: string): string | null => {
+    // Check for repeated words
+    const { hasRepeatedWords, repeatedWord } = detectRepeatedWords(text);
+    if (hasRepeatedWords) {
+      return `Repeated word detected: "${repeatedWord}". Please check your text.`;
+    }
+
+    return null;
+  };
+
+  return { 
+    validateIbonoInput, 
+    validateEnglishInput, 
+    setValidationError, 
+    validationError 
+  };
 };
 
 export default useEnglishDetection;

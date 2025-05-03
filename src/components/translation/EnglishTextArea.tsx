@@ -5,9 +5,10 @@ interface EnglishTextAreaProps {
   value: string;
   onChange: (value: string) => void;
   hasDuplicateAlert: boolean;
+  validationError: string | null;
 }
 
-const EnglishTextArea = ({ value, onChange, hasDuplicateAlert }: EnglishTextAreaProps) => {
+const EnglishTextArea = ({ value, onChange, hasDuplicateAlert, validationError }: EnglishTextAreaProps) => {
   return (
     <div>
       <label htmlFor="english" className="block text-sm font-medium mb-2">
@@ -19,8 +20,17 @@ const EnglishTextArea = ({ value, onChange, hasDuplicateAlert }: EnglishTextArea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={4}
-        className={`w-full text-lg ${hasDuplicateAlert ? 'border-amber-500 focus-visible:ring-amber-500' : ''}`}
+        className={`w-full text-lg ${
+          validationError 
+            ? 'border-red-500 focus-visible:ring-red-500' 
+            : hasDuplicateAlert 
+              ? 'border-amber-500 focus-visible:ring-amber-500' 
+              : ''
+        }`}
       />
+      {validationError && (
+        <p className="mt-2 text-sm text-red-600">{validationError}</p>
+      )}
     </div>
   );
 };
