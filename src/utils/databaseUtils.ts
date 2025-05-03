@@ -18,9 +18,9 @@ export const findExistingTranslation = async (english: string, ibono: string): P
     const { data: exactMatch, error: exactError } = await supabase
       .from(TABLE_NAME)
       .select('*')
-      .eq('english', english.trim())
-      .eq('ibono', ibono.trim())
-      .single();
+      .ilike('english', english.trim())
+      .ilike('ibono', ibono.trim())
+      .maybeSingle();
       
     if (exactError && exactError.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
       console.error("Error checking for existing translation:", exactError);
@@ -33,7 +33,7 @@ export const findExistingTranslation = async (english: string, ibono: string): P
     const { data: englishMatch, error: englishError } = await supabase
       .from(TABLE_NAME)
       .select('*')
-      .eq('english', english.trim())
+      .ilike('english', english.trim())
       .maybeSingle();
       
     if (englishError && englishError.code !== 'PGRST116') {
@@ -91,6 +91,19 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
         details: error.details,
         hint: error.hint
       });
+      
+      // Special handling for unique constraint violation
+      if (error.code === '23505') {
+        // This is a duplicate that our previous check missed
+        // Let's fetch the existing translation to provide better feedback
+        const existing = await findExistingTranslation(trimmedEnglish, trimmedIbono);
+        return {
+          data: null,
+          isDuplicate: true,
+          existingTranslation: existing
+        };
+      }
+      
       throw error;
     }
     
