@@ -9,6 +9,7 @@ interface EnglishTextAreaProps {
   suggestions?: { text: string, replacements: string[] } | null;
   onReplaceSuggestion?: (replacement: string) => void;
   hasExtraSpaces?: boolean;
+  repeatedWords?: string[];
 }
 
 const EnglishTextArea = ({ 
@@ -18,7 +19,8 @@ const EnglishTextArea = ({
   validationError,
   suggestions,
   onReplaceSuggestion,
-  hasExtraSpaces = false
+  hasExtraSpaces = false,
+  repeatedWords = []
 }: EnglishTextAreaProps) => {
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
@@ -53,7 +55,17 @@ const EnglishTextArea = ({
         spellCheck={true}
       />
       {validationError && (
-        <p className="mt-2 text-sm text-red-600">{validationError}</p>
+        <div>
+          <p className="mt-2 text-sm text-red-600">{validationError}</p>
+          {repeatedWords && repeatedWords.length > 0 && (
+            <div className="mt-1 text-xs text-red-500">
+              <span>Repeated words: </span>
+              {repeatedWords.map((word, index) => (
+                <span key={index} className="font-semibold">{word}{index < repeatedWords.length - 1 ? ', ' : ''}</span>
+              ))}
+            </div>
+          )}
+        </div>
       )}
       {hasExtraSpaces && !validationError && (
         <div className="mt-2 flex items-center">

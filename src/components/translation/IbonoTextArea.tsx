@@ -12,6 +12,7 @@ interface IbonoTextAreaProps {
   hasExtraSpaces?: boolean;
   potentialEnglishDetected?: boolean;
   onAcceptEnglish?: () => void;
+  repeatedWords?: string[];
 }
 
 const IbonoTextArea = ({ 
@@ -21,7 +22,8 @@ const IbonoTextArea = ({
   duplicateType,
   hasExtraSpaces = false,
   potentialEnglishDetected = false,
-  onAcceptEnglish
+  onAcceptEnglish,
+  repeatedWords = []
 }: IbonoTextAreaProps) => {
   const addSpecialChar = (char: string) => {
     const ibonoTextarea = document.getElementById('ibono') as HTMLTextAreaElement;
@@ -44,6 +46,14 @@ const IbonoTextArea = ({
     // Replace multiple spaces with single space
     const fixedText = value.replace(/\s+/g, ' ');
     onChange(fixedText);
+  };
+
+  const highlightText = () => {
+    if (!value || repeatedWords.length === 0) return value;
+    
+    let highlightedText = value;
+    // Just for display purposes - we'll highlight repeated words in error messages
+    return highlightedText;
   };
 
   return (
@@ -73,6 +83,15 @@ const IbonoTextArea = ({
       {validationError && (
         <div className="mt-2">
           <p className="text-sm text-red-600">{validationError}</p>
+          
+          {repeatedWords.length > 0 && (
+            <div className="mt-1 text-xs text-red-500">
+              <span>Repeated words: </span>
+              {repeatedWords.map((word, index) => (
+                <span key={index} className="font-semibold">{word}{index < repeatedWords.length - 1 ? ', ' : ''}</span>
+              ))}
+            </div>
+          )}
           
           {potentialEnglishDetected && onAcceptEnglish && (
             <Button 

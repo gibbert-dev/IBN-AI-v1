@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { saveTranslation } from "@/utils/syncService"; // Changed to use syncService
@@ -26,7 +27,8 @@ const TranslationForm = () => {
     suggestions,
     hasExtraSpaces,
     potentialEnglishDetected,
-    acceptEnglishWords
+    acceptEnglishWords,
+    detectedRepeatedWords
   } = useEnglishDetection();
   
   const [englishValidationError, setEnglishValidationError] = useState<string | null>(null);
@@ -208,6 +210,7 @@ const TranslationForm = () => {
         hasExtraSpaces={hasExtraSpaces}
         potentialEnglishDetected={potentialEnglishDetected}
         onAcceptEnglish={handleAcceptEnglishWords}
+        repeatedWords={detectedRepeatedWords}
       />
       
       <EnglishTextArea 
@@ -218,6 +221,7 @@ const TranslationForm = () => {
         suggestions={suggestions}
         onReplaceSuggestion={handleReplaceSuggestion}
         hasExtraSpaces={englishHasExtraSpaces}
+        repeatedWords={detectedRepeatedWords}
       />
     </TranslationFormContainer>
   );

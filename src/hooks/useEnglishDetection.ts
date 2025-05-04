@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { detectRepeatedWords } from "@/utils/textValidation";
+import { detectRepeatedWords, detectExactDuplicateWords } from "@/utils/textValidation";
 
 // Characters commonly found in English but not in Ibọnọ language
 const ENGLISH_INDICATORS = ['w', 'c', 'q', 'x', 'z', 'j', 'v'];
@@ -25,6 +26,7 @@ export const useEnglishDetection = () => {
   const [hasExtraSpaces, setHasExtraSpaces] = useState<boolean>(false);
   const [potentialEnglishDetected, setPotentialEnglishDetected] = useState<boolean>(false);
   const [acceptedEnglishWords, setAcceptedEnglishWords] = useState<string[]>([]);
+  const [detectedRepeatedWords, setDetectedRepeatedWords] = useState<string[]>([]);
 
   const detectEnglishInIbono = (text: string): { isEnglish: boolean, englishSegment: string | null } => {
     if (!text.trim()) return { isEnglish: false, englishSegment: null };
@@ -96,6 +98,7 @@ export const useEnglishDetection = () => {
     setHasExtraSpaces(false);
     setSuggestions(null);
     setPotentialEnglishDetected(false);
+    setDetectedRepeatedWords([]);
 
     // First check for English text
     const { isEnglish, englishSegment } = detectEnglishInIbono(text);
@@ -106,14 +109,28 @@ export const useEnglishDetection = () => {
 
     // Then check for repeated words
     const { hasRepeatedWords, repeatedWord } = detectRepeatedWords(text);
-    if (hasRepeatedWords) {
+    
+    // Also check for non-adjacent duplicate words
+    const { hasDuplicates, duplicatedWords } = detectExactDuplicateWords(text);
+    
+    if (hasRepeatedWords && repeatedWord) {
+      setDetectedRepeatedWords(repeatedWord ? [repeatedWord] : []);
       return `Repeated word detected: "${repeatedWord}". Please check your translation.`;
+    }
+    
+    if (hasDuplicates && duplicatedWords.length > 0) {
+      setDetectedRepeatedWords(duplicatedWords);
+      if (duplicatedWords.length === 1) {
+        return `Word "${duplicatedWords[0]}" appears multiple times. This might be intentional, but please check your translation.`;
+      } else {
+        return `Several words appear multiple times: "${duplicatedWords.slice(0, 3).join('", "')}${duplicatedWords.length > 3 ? '...' : ''}". Please review your translation.`;
+      }
     }
 
     // Check for extra spaces
     if (detectExtraSpaces(text)) {
       setHasExtraSpaces(true);
-      return "Extra spaces detected. Consider removing them for better formatting.";
+      return null; // Not a critical error, just a warning
     }
 
     return null;
@@ -130,11 +147,26 @@ export const useEnglishDetection = () => {
   const validateEnglishInput = (text: string): string | null => {
     setHasExtraSpaces(false);
     setSuggestions(null);
+    setDetectedRepeatedWords([]);
     
     // Check for repeated words
     const { hasRepeatedWords, repeatedWord } = detectRepeatedWords(text);
-    if (hasRepeatedWords) {
+    
+    // Also check for non-adjacent duplicate words
+    const { hasDuplicates, duplicatedWords } = detectExactDuplicateWords(text);
+    
+    if (hasRepeatedWords && repeatedWord) {
+      setDetectedRepeatedWords(repeatedWord ? [repeatedWord] : []);
       return `Repeated word detected: "${repeatedWord}". Please check your text.`;
+    }
+    
+    if (hasDuplicates && duplicatedWords.length > 0) {
+      setDetectedRepeatedWords(duplicatedWords);
+      if (duplicatedWords.length === 1) {
+        return `Word "${duplicatedWords[0]}" appears multiple times. This might be intentional, but please check your text.`;
+      } else {
+        return `Several words appear multiple times: "${duplicatedWords.slice(0, 3).join('", "')}${duplicatedWords.length > 3 ? '...' : ''}". Please review your text.`;
+      }
     }
     
     // Check for extra spaces
@@ -161,7 +193,8 @@ export const useEnglishDetection = () => {
     suggestions,
     hasExtraSpaces,
     potentialEnglishDetected,
-    acceptEnglishWords
+    acceptEnglishWords,
+    detectedRepeatedWords
   };
 };
 
