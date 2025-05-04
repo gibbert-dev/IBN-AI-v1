@@ -22,7 +22,7 @@ export const detectRepeatedWords = (text: string): {
     .map(word => word.toLowerCase().replace(/[,.!?;:"()[\]{}]/g, ''))
     .filter(word => word.length > 0);
 
-  // Check for adjacent repeated words
+  // Check for adjacent repeated words (case insensitive)
   for (let i = 0; i < words.length - 1; i++) {
     if (words[i] === words[i + 1] && words[i].length > 1) { // Added length check to avoid flagging single characters
       return { 
