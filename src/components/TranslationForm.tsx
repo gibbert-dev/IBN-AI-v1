@@ -6,6 +6,7 @@ import DuplicateTranslationAlert from "./translation/DuplicateTranslationAlert";
 import IbonoTextArea from "./translation/IbonoTextArea";
 import EnglishTextArea from "./translation/EnglishTextArea";
 import TranslationFormContainer from "./translation/TranslationFormContainer";
+import SuggestionAlert from "./translation/SuggestionAlert";
 import useEnglishDetection from "@/hooks/useEnglishDetection";
 import { useOfflineStatus } from "@/context/OfflineContext";
 
@@ -22,10 +23,14 @@ const TranslationForm = () => {
     validateIbonoInput, 
     validateEnglishInput, 
     validationError, 
-    setValidationError 
+    setValidationError,
+    suggestions,
+    hasExtraSpaces
   } = useEnglishDetection();
   
   const [englishValidationError, setEnglishValidationError] = useState<string | null>(null);
+  const [englishHasExtraSpaces, setEnglishHasExtraSpaces] = useState<boolean>(false);
+  
   const { isOnline } = useOfflineStatus();
   
   const handleIbonoChange = (text: string) => {
@@ -47,11 +52,21 @@ const TranslationForm = () => {
     
     if (duplicateAlert) setDuplicateAlert(null);
     
-    // Check for repeated words in English text
+    // Check for repeated words and typos in English text
     const error = validateEnglishInput(text);
     if (error) {
       setEnglishValidationError(error);
     }
+  };
+
+  const handleReplaceSuggestion = (replacement: string) => {
+    if (!suggestions) return;
+    
+    // Replace the typo with the suggested correction
+    const regex = new RegExp(`\\b${suggestions.text}\\b`, 'gi');
+    const correctedText = englishText.replace(regex, replacement);
+    setEnglishText(correctedText);
+    setEnglishValidationError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,11 +171,20 @@ const TranslationForm = () => {
         />
       )}
       
+      {suggestions && !duplicateAlert && (
+        <SuggestionAlert 
+          text={suggestions.text}
+          replacements={suggestions.replacements}
+          onReplace={handleReplaceSuggestion}
+        />
+      )}
+      
       <IbonoTextArea 
         value={ibonoText}
         onChange={handleIbonoChange}
         validationError={validationError}
         duplicateType={duplicateAlert?.type === 'exact' ? 'exact' : null}
+        hasExtraSpaces={hasExtraSpaces}
       />
       
       <EnglishTextArea 
@@ -168,6 +192,9 @@ const TranslationForm = () => {
         onChange={handleEnglishChange}
         hasDuplicateAlert={!!duplicateAlert}
         validationError={englishValidationError}
+        suggestions={suggestions}
+        onReplaceSuggestion={handleReplaceSuggestion}
+        hasExtraSpaces={englishHasExtraSpaces}
       />
     </TranslationFormContainer>
   );

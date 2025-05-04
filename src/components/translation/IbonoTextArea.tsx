@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import SpecialCharacterButtons from "./SpecialCharacterButtons";
 
@@ -8,9 +7,16 @@ interface IbonoTextAreaProps {
   onChange: (value: string) => void;
   validationError: string | null;
   duplicateType?: 'exact' | null;
+  hasExtraSpaces?: boolean;
 }
 
-const IbonoTextArea = ({ value, onChange, validationError, duplicateType }: IbonoTextAreaProps) => {
+const IbonoTextArea = ({ 
+  value, 
+  onChange, 
+  validationError, 
+  duplicateType,
+  hasExtraSpaces = false
+}: IbonoTextAreaProps) => {
   const addSpecialChar = (char: string) => {
     const ibonoTextarea = document.getElementById('ibono') as HTMLTextAreaElement;
     if (ibonoTextarea) {
@@ -26,6 +32,12 @@ const IbonoTextArea = ({ value, onChange, validationError, duplicateType }: Ibon
       ibonoTextarea.focus();
       ibonoTextarea.setSelectionRange(start + char.length, start + char.length);
     }
+  };
+
+  const handleFixSpaces = () => {
+    // Replace multiple spaces with single space
+    const fixedText = value.replace(/\s+/g, ' ');
+    onChange(fixedText);
   };
 
   return (
@@ -44,12 +56,29 @@ const IbonoTextArea = ({ value, onChange, validationError, duplicateType }: Ibon
             ? 'border-red-500 focus-visible:ring-red-500' 
             : duplicateType === 'exact' 
               ? 'border-amber-500 focus-visible:ring-amber-500' 
-              : ''
+              : hasExtraSpaces
+                ? 'border-blue-400 focus-visible:ring-blue-400'
+                : ''
         }`}
+        // Set spellCheck to false for Ibọnọ because browsers don't have Ibọnọ dictionaries
+        spellCheck={false}
       />
       
       {validationError && (
         <p className="mt-2 text-sm text-red-600">{validationError}</p>
+      )}
+      
+      {hasExtraSpaces && !validationError && (
+        <div className="mt-2 flex items-center">
+          <p className="text-xs text-blue-600 mr-2">Extra spaces detected.</p>
+          <button 
+            type="button"
+            onClick={handleFixSpaces}
+            className="text-xs underline text-blue-600 hover:text-blue-800"
+          >
+            Fix automatically
+          </button>
+        </div>
       )}
       
       <SpecialCharacterButtons onCharacterSelect={addSpecialChar} />

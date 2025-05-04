@@ -6,9 +6,30 @@ interface EnglishTextAreaProps {
   onChange: (value: string) => void;
   hasDuplicateAlert: boolean;
   validationError: string | null;
+  suggestions?: { text: string, replacements: string[] } | null;
+  onReplaceSuggestion?: (replacement: string) => void;
+  hasExtraSpaces?: boolean;
 }
 
-const EnglishTextArea = ({ value, onChange, hasDuplicateAlert, validationError }: EnglishTextAreaProps) => {
+const EnglishTextArea = ({ 
+  value, 
+  onChange, 
+  hasDuplicateAlert, 
+  validationError,
+  suggestions,
+  onReplaceSuggestion,
+  hasExtraSpaces = false
+}: EnglishTextAreaProps) => {
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  };
+
+  const handleFixSpaces = () => {
+    // Replace multiple spaces with single space
+    const fixedText = value.replace(/\s+/g, ' ');
+    onChange(fixedText);
+  };
+
   return (
     <div>
       <label htmlFor="english" className="block text-sm font-medium mb-2">
@@ -18,18 +39,33 @@ const EnglishTextArea = ({ value, onChange, hasDuplicateAlert, validationError }
         id="english"
         placeholder="Enter English text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleInput}
         rows={4}
         className={`w-full text-lg ${
           validationError 
             ? 'border-red-500 focus-visible:ring-red-500' 
             : hasDuplicateAlert 
               ? 'border-amber-500 focus-visible:ring-amber-500' 
-              : ''
+              : hasExtraSpaces
+                ? 'border-blue-400 focus-visible:ring-blue-400'
+                : ''
         }`}
+        spellCheck={true}
       />
       {validationError && (
         <p className="mt-2 text-sm text-red-600">{validationError}</p>
+      )}
+      {hasExtraSpaces && !validationError && (
+        <div className="mt-2 flex items-center">
+          <p className="text-xs text-blue-600 mr-2">Extra spaces detected.</p>
+          <button 
+            type="button"
+            onClick={handleFixSpaces}
+            className="text-xs underline text-blue-600 hover:text-blue-800"
+          >
+            Fix automatically
+          </button>
+        </div>
       )}
     </div>
   );
