@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { detectRepeatedWords } from "@/utils/textValidation";
 
@@ -24,24 +23,46 @@ export const useEnglishDetection = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<{ text: string, replacements: string[] } | null>(null);
   const [hasExtraSpaces, setHasExtraSpaces] = useState<boolean>(false);
+  const [potentialEnglishDetected, setPotentialEnglishDetected] = useState<boolean>(false);
+  const [acceptedEnglishWords, setAcceptedEnglishWords] = useState<string[]>([]);
 
-  const detectEnglishInIbono = (text: string): boolean => {
-    if (!text.trim()) return false;
+  const detectEnglishInIbono = (text: string): { isEnglish: boolean, englishSegment: string | null } => {
+    if (!text.trim()) return { isEnglish: false, englishSegment: null };
     
     // Check for common English words
     const commonEnglishWords = ['the', 'and', 'this', 'that', 'with', 'for', 'from', 'have', 'who'];
     const words = text.toLowerCase().split(/\s+/);
     
     // Check for English-specific characters
-    const hasEnglishChars = ENGLISH_INDICATORS.some(char => text.toLowerCase().includes(char));
+    const englishCharsFound = words.filter(word => {
+      return ENGLISH_INDICATORS.some(char => word.includes(char));
+    });
     
     // Check for common English words
-    const hasEnglishWords = commonEnglishWords.some(word => 
-      words.includes(word) || words.some(w => w === word+'.' || w === word+',' || w === word+'!')
-    );
+    const englishWordsFound = words.filter(word => {
+      const cleanWord = word.replace(/[,.!?;:"()[\]{}]/g, '');
+      return commonEnglishWords.includes(cleanWord) || 
+             commonEnglishWords.some(commonWord => cleanWord === commonWord+'.' || cleanWord === commonWord+',' || cleanWord === commonWord+'!');
+    });
     
-    // If the text has multiple indicators of being English, flag it
-    return (hasEnglishChars && text.length > 5) || hasEnglishWords;
+    // If we found English words or characters, check if they're already accepted
+    const allFoundEnglish = [...new Set([...englishCharsFound, ...englishWordsFound])];
+    
+    if (allFoundEnglish.length > 0) {
+      // Check if we've already accepted these words
+      const notAcceptedWords = allFoundEnglish.filter(
+        word => !acceptedEnglishWords.includes(word)
+      );
+      
+      if (notAcceptedWords.length > 0) {
+        return { 
+          isEnglish: true, 
+          englishSegment: notAcceptedWords.join(', ')
+        };
+      }
+    }
+    
+    return { isEnglish: false, englishSegment: null };
   };
 
   const detectExtraSpaces = (text: string): boolean => {
@@ -74,10 +95,13 @@ export const useEnglishDetection = () => {
   const validateIbonoInput = (text: string): string | null => {
     setHasExtraSpaces(false);
     setSuggestions(null);
+    setPotentialEnglishDetected(false);
 
     // First check for English text
-    if (detectEnglishInIbono(text)) {
-      return "This appears to be English text. Please enter Ibọnọ language text.";
+    const { isEnglish, englishSegment } = detectEnglishInIbono(text);
+    if (isEnglish && englishSegment) {
+      setPotentialEnglishDetected(true);
+      return `This appears to contain English text: "${englishSegment}". Please enter Ibọnọ language text or click "Accept as Valid" to continue.`;
     }
 
     // Then check for repeated words
@@ -95,6 +119,14 @@ export const useEnglishDetection = () => {
     return null;
   };
 
+  const acceptEnglishWords = (text: string) => {
+    const words = text.toLowerCase().split(/\s+/).map(word => word.replace(/[,.!?;:"()[\]{}]/g, ''));
+    setAcceptedEnglishWords(prev => [...new Set([...prev, ...words])]);
+    setValidationError(null);
+    setPotentialEnglishDetected(false);
+  };
+
+  // Rest of the hook remains the same
   const validateEnglishInput = (text: string): string | null => {
     setHasExtraSpaces(false);
     setSuggestions(null);
@@ -127,7 +159,9 @@ export const useEnglishDetection = () => {
     setValidationError,
     validationError,
     suggestions,
-    hasExtraSpaces
+    hasExtraSpaces,
+    potentialEnglishDetected,
+    acceptEnglishWords
   };
 };
 

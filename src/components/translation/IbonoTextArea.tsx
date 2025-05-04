@@ -1,5 +1,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 import SpecialCharacterButtons from "./SpecialCharacterButtons";
 
 interface IbonoTextAreaProps {
@@ -8,6 +10,8 @@ interface IbonoTextAreaProps {
   validationError: string | null;
   duplicateType?: 'exact' | null;
   hasExtraSpaces?: boolean;
+  potentialEnglishDetected?: boolean;
+  onAcceptEnglish?: () => void;
 }
 
 const IbonoTextArea = ({ 
@@ -15,7 +19,9 @@ const IbonoTextArea = ({
   onChange, 
   validationError, 
   duplicateType,
-  hasExtraSpaces = false
+  hasExtraSpaces = false,
+  potentialEnglishDetected = false,
+  onAcceptEnglish
 }: IbonoTextAreaProps) => {
   const addSpecialChar = (char: string) => {
     const ibonoTextarea = document.getElementById('ibono') as HTMLTextAreaElement;
@@ -65,7 +71,21 @@ const IbonoTextArea = ({
       />
       
       {validationError && (
-        <p className="mt-2 text-sm text-red-600">{validationError}</p>
+        <div className="mt-2">
+          <p className="text-sm text-red-600">{validationError}</p>
+          
+          {potentialEnglishDetected && onAcceptEnglish && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={onAcceptEnglish} 
+              className="mt-2 text-xs border-blue-500 text-blue-600 hover:text-blue-700 hover:bg-blue-50 flex items-center"
+            >
+              <Check className="w-3 h-3 mr-1" /> Accept as Valid
+            </Button>
+          )}
+        </div>
       )}
       
       {hasExtraSpaces && !validationError && (

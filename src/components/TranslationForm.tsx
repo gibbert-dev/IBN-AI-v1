@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { saveTranslation } from "@/utils/syncService"; // Changed to use syncService
@@ -25,7 +24,9 @@ const TranslationForm = () => {
     validationError, 
     setValidationError,
     suggestions,
-    hasExtraSpaces
+    hasExtraSpaces,
+    potentialEnglishDetected,
+    acceptEnglishWords
   } = useEnglishDetection();
   
   const [englishValidationError, setEnglishValidationError] = useState<string | null>(null);
@@ -69,6 +70,15 @@ const TranslationForm = () => {
     setEnglishValidationError(null);
   };
 
+  // Add a handler for accepting English words in Ibono
+  const handleAcceptEnglishWords = () => {
+    acceptEnglishWords(ibonoText);
+    toast({
+      title: "English Words Accepted",
+      description: "These words will be accepted in your Ibọnọ translations.",
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -83,11 +93,22 @@ const TranslationForm = () => {
     
     // Check for English in Ibọnọ field
     const ibonoError = validateIbonoInput(ibonoText);
-    if (ibonoError) {
+    if (ibonoError && !potentialEnglishDetected) {
       setValidationError(ibonoError);
       toast({
         title: "Validation Error",
         description: ibonoError,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // If user has decided to accept English words, allow submission even with validation error
+    if (ibonoError && potentialEnglishDetected) {
+      // If they haven't clicked "Accept as Valid", show an error
+      toast({
+        title: "Validation Error",
+        description: "Please click 'Accept as Valid' to confirm use of English words or correct your translation.",
         variant: "destructive"
       });
       return;
@@ -161,7 +182,7 @@ const TranslationForm = () => {
     <TranslationFormContainer 
       isSubmitting={isSubmitting} 
       onSubmit={handleSubmit}
-      isSubmitDisabled={!!validationError || !!englishValidationError}
+      isSubmitDisabled={(!!validationError && !potentialEnglishDetected) || !!englishValidationError}
       showOfflineIndicator={true}
     >
       {duplicateAlert && (
@@ -185,6 +206,8 @@ const TranslationForm = () => {
         validationError={validationError}
         duplicateType={duplicateAlert?.type === 'exact' ? 'exact' : null}
         hasExtraSpaces={hasExtraSpaces}
+        potentialEnglishDetected={potentialEnglishDetected}
+        onAcceptEnglish={handleAcceptEnglishWords}
       />
       
       <EnglishTextArea 
