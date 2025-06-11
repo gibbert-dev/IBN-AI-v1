@@ -1,0 +1,31 @@
+text,label
+"This movie is absolutely amazing!",positive
+"I love this product, it's fantastic!",positive
+"Great service and excellent quality.",positive
+"Wonderful experience, highly recommended!",positive
+"Outstanding performance and great value.",positive
+"Perfect! Exactly what I was looking for.",positive
+"Excellent customer service and fast delivery.",positive
+"This is the best purchase I've made this year.",positive
+"Incredible quality and attention to detail.",positive
+"Absolutely delighted with this product!",positive
+"This is terrible, I hate it.",negative
+"Worst product ever, complete waste of money.",negative
+"Poor quality and bad customer service.",negative
+"I regret buying this, very disappointed.",negative
+"Awful experience, would not recommend.",negative
+"Completely useless and overpriced.",negative
+"Terrible quality, broke after one day.",negative
+"Worst customer service I've ever experienced.",negative
+"This product is a complete disaster.",negative
+"Absolutely horrible, avoid at all costs!",negative
+"It's okay, nothing special.",neutral
+"Average product, does what it's supposed to do.",neutral
+"Not bad, but not great either.",neutral
+"It's fine, meets basic expectations.",neutral
+"Decent quality for the price.",neutral
+"Standard product, nothing remarkable.",neutral
+"It works as expected, no complaints.",neutral
+"Fair quality, reasonable price.",neutral
+"Acceptable performance, could be better.",neutral
+"It's alright, serves its purpose.",neutral

@@ -1,124 +1,138 @@
-# IBN-AI: Ibọnọ Translation Project
+# AI Model Finetuning and Deployment Application
 
-A project by JR Digital Insights
-
-## About the Project
-
-IBN-AI is a community-driven initiative to develop AI translation tools for the Ibọnọ language, preserving linguistic heritage through modern technology. The project aims to create a comprehensive English-Ibọnọ translation system by collecting translation pairs and training machine learning models.
-
-### What is Ibọnọ?
-Ibọnọ (pronounced [ee-boh-naw]) is a Nigerian language spoken by the Ibeno people, part of the Obolo ethnic group in Akwa Ibom State. It is a Lower Cross River language within the Niger-Congo family and is considered an endangered language that needs documentation and preservation efforts.
+A comprehensive Python application for finetuning pre-trained language models and deploying them as API services.
 
 ## Features
 
-- **Translation Contribution System**
-  - User-friendly form for submitting English-Ibọnọ translation pairs
-  - Special character input support for Ibọnọ-specific characters (ọ, ị, n̄, ǝ)
-  - Dataset management and export capabilities (JSON/CSV)
+- **Data Ingestion**: Support for CSV and JSON datasets
+- **Model Finetuning**: Finetune pre-trained models from Hugging Face
+- **API Deployment**: Deploy finetuned models as REST APIs
+- **Web Interface**: User-friendly interface for training and prediction
+- **Evaluation Metrics**: Comprehensive model evaluation with visualizations
 
-- **Translation Demo**
-  - Interactive translation interface
-  - Real-time translation preview
-  - Supports common phrases and vocabulary
-
-- **Educational Resources**
-  - Comprehensive information about the Ibọnọ language
-  - Cultural context and linguistic characteristics
-  - Community engagement features
-
-- **ML Pipeline Integration**
-  1. Data Collection through user contributions
-  2. Dataset Export for preprocessing
-  3. Model Training using Hugging Face
-  4. Model Deployment for translation
-
-## Technologies Used
-
-This project is built with:
-- Vite - Next Generation Frontend Tooling
-- TypeScript - Type-safe JavaScript
-- React - UI Framework
-- shadcn/ui - High-quality UI components
-- Tailwind CSS - Utility-first CSS framework
-- Supabase - Backend and Database
-
-## Getting Started
-
-### Prerequisites
-- Node.js & npm installed ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
-
-### Installation
+## Installation
 
 1. Clone the repository:
-```sh
-git clone <YOUR_GIT_URL>
+```bash
+git clone <repository-url>
+cd ai-finetuning-app
 ```
 
-2. Navigate to the project directory:
-```sh
-cd <YOUR_PROJECT_NAME>
+2. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
-```sh
-npm install
+```bash
+pip install -r requirements.txt
 ```
 
-4. Start the development server:
-```sh
-npm run dev
+## Project Structure
+
+```
+ai-finetuning-app/
+├── src/
+│   ├── data/
+│   │   ├── __init__.py
+│   │   ├── loader.py          # Data loading and preprocessing
+│   │   └── dataset.py         # Custom dataset classes
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── trainer.py         # Model training logic
+│   │   └── predictor.py       # Model inference logic
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── app.py            # FastAPI application
+│   │   └── routes.py         # API routes
+│   ├── ui/
+│   │   ├── __init__.py
+│   │   └── streamlit_app.py  # Streamlit interface
+│   └── utils/
+│       ├── __init__.py
+│       ├── config.py         # Configuration management
+│       └── metrics.py        # Evaluation metrics
+├── data/                     # Sample datasets
+├── models/                   # Saved models directory
+├── logs/                     # Training logs
+├── requirements.txt
+├── README.md
+└── main.py                   # Main application entry point
 ```
 
-## Development
+## Quick Start
 
-### Using Local IDE
-Clone the repository and push changes to your preferred Git hosting service.
+### 1. Prepare Your Dataset
 
-### Using GitHub Codespaces
-1. Navigate to the repository's main page
-2. Click "Code" > "Codespaces" tab
-3. Click "New codespace"
+Create a CSV file with `text` and `label` columns:
+```csv
+text,label
+"This movie is amazing!",positive
+"I didn't like this film.",negative
+```
 
-## Deployment
+Or a JSON file:
+```json
+[
+    {"text": "This movie is amazing!", "label": "positive"},
+    {"text": "I didn't like this film.", "label": "negative"}
+]
+```
 
-### Vercel Deployment (Recommended)
-1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
-2. Visit [Vercel](https://vercel.com) and sign in
-3. Click "New Project" and import your repository
-4. Configure the project:
-   - Framework Preset: Vite
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-5. Click "Deploy"
+### 2. Finetune a Model
 
-The application will be automatically deployed and you'll receive a production URL. Vercel will automatically redeploy on every push to your main branch.
+```python
+from src.models.trainer import ModelTrainer
 
-### Custom Domain Setup on Vercel
-1. Go to your project settings in Vercel
-2. Navigate to the "Domains" section
-3. Add your custom domain
-4. Follow Vercel's DNS configuration instructions
+trainer = ModelTrainer(
+    model_name="bert-base-uncased",
+    num_labels=2,
+    output_dir="./models/my_model"
+)
 
-## Contributing
+trainer.train(
+    train_file="data/train.csv",
+    num_epochs=3,
+    batch_size=16,
+    learning_rate=2e-5
+)
+```
 
-We welcome contributions from the community! You can help by:
-- Adding new English-Ibọnọ translation pairs
-- Improving the ML pipeline
-- Enhancing the UI/UX
-- Providing cultural and linguistic expertise
+### 3. Start the API Service
 
-## Support
+```bash
+python -m src.api.app
+```
 
-If you encounter any issues or have suggestions:
-- Open an issue in the repository
-- Contact the development team
+### 4. Make Predictions
 
-## License
+```bash
+curl -X POST "http://localhost:8000/predict" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "This is a great product!"}'
+```
 
-This project is licensed under standard open-source terms. See the LICENSE file for details.
+### 5. Use the Web Interface
 
-## Acknowledgments
+```bash
+streamlit run src/ui/streamlit_app.py
+```
 
-- The Ibeno community for their cultural and linguistic contributions
-- JR Digital Insights development team
-- Contributors to the translation dataset
+## API Endpoints
+
+- `POST /predict`: Make predictions on new text
+- `GET /health`: Check API health
+- `GET /model/info`: Get model information
+
+## Configuration
+
+Edit `src/utils/config.py` to customize:
+- Model parameters
+- Training hyperparameters
+- API settings
+- File paths
+
+## Examples
+
+See the `examples/` directory for complete usage examples and sample datasets.
