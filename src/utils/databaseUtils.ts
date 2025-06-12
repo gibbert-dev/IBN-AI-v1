@@ -1,12 +1,15 @@
-import { supabase } from './supabaseClient';
+
+import { supabase } from '@/integrations/supabase/client';
 import { LocalTranslation } from './indexedDbService';
 
 export interface Translation {
   id: number;
   english: string;
   ibono: string;
-  context?: string; // New optional context field
-  created_at?: string; // Using created_at instead of timestamp as it's likely Supabase's default
+  context?: string;
+  user_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Table name in Supabase
@@ -22,7 +25,7 @@ export const findExistingTranslation = async (english: string, ibono: string): P
       .ilike('ibono', ibono.trim())
       .maybeSingle();
       
-    if (exactError && exactError.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+    if (exactError && exactError.code !== 'PGRST116') {
       console.error("Error checking for existing translation:", exactError);
       throw exactError;
     }
@@ -56,6 +59,13 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
   existingTranslation: Translation | null 
 }> => {
   try {
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User must be authenticated to save translations");
+    }
+
     // Trim inputs to avoid whitespace-only differences
     const trimmedEnglish = english.trim();
     const trimmedIbono = ibono.trim();
@@ -77,7 +87,7 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
       english: trimmedEnglish,
       ibono: trimmedIbono,
       context: trimmedContext,
-      // Supabase will handle the created_at timestamp automatically
+      user_id: user.id,
     };
     
     const { data, error } = await supabase
@@ -97,7 +107,6 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
       // Special handling for unique constraint violation
       if (error.code === '23505') {
         // This is a duplicate that our previous check missed
-        // Let's fetch the existing translation to provide better feedback
         const existing = await findExistingTranslation(trimmedEnglish, trimmedIbono);
         return {
           data: null,
@@ -157,10 +166,17 @@ export const deleteTranslation = async (id: number): Promise<void> => {
 };
 
 export const clearAllTranslations = async (): Promise<void> => {
+  // Only allow clearing user's own translations
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error("User must be authenticated to clear translations");
+  }
+
   const { error } = await supabase
     .from(TABLE_NAME)
     .delete()
-    .neq('id', 0); // Deletes all records
+    .eq('user_id', user.id);
     
   if (error) {
     console.error("Error clearing translations:", error);

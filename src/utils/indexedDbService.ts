@@ -1,3 +1,4 @@
+
 /**
  * IndexedDB service for local storage of translations
  */
@@ -13,7 +14,8 @@ export interface LocalTranslation {
   local_id?: number; // Local database ID
   english: string;
   ibono: string;
-  context?: string; // New optional context field
+  context?: string;
+  user_id?: string; // Added user_id field
   created_at?: string;
   updated_at?: string;
   is_synced?: boolean;
@@ -87,8 +89,8 @@ export const addLocalTranslation = async (translation: LocalTranslation): Promis
       ...translation,
       created_at: translation.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      is_synced: false,
-      sync_status: 'pending' as const
+      is_synced: translation.is_synced || false,
+      sync_status: translation.sync_status || 'pending' as const
     };
     
     const request = store.add(translationWithMeta);

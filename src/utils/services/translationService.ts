@@ -12,6 +12,7 @@ import { LocalTranslation } from "../indexedDbService";
 import { Translation } from "../databaseUtils";
 import { checkOnlineStatus } from "./networkService";
 import { syncLocalWithRemote } from "./syncQueueService";
+import { supabase } from '@/integrations/supabase/client';
 
 // Find duplicate translations locally
 export const findLocalDuplicate = async (english: string, ibono: string): Promise<LocalTranslation | null> => {
@@ -49,6 +50,13 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
   const trimmedContext = context?.trim() || undefined;
 
   try {
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User must be authenticated to save translations");
+    }
+
     if (checkOnlineStatus()) {
       // Try saving to Supabase
       console.log('Saving to Supabase');
@@ -62,6 +70,7 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
           ibono: trimmedIbono,
           context: trimmedContext,
           created_at: result.data.created_at,
+          user_id: result.data.user_id,
           is_synced: true,
           sync_status: 'synced'
         });
@@ -90,6 +99,7 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
         ibono: trimmedIbono,
         context: trimmedContext,
         created_at: new Date().toISOString(),
+        user_id: user.id,
         is_synced: false,
         sync_status: 'pending'
       };
