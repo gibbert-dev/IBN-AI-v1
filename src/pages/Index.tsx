@@ -6,13 +6,19 @@ import DatasetViewer from "@/components/DatasetViewer";
 import MLPipeline from "@/components/MLPipeline";
 import TranslationDemo from "@/components/TranslationDemo";
 import IbenoInfo from "@/components/IbenoInfo";
+import LanguageStats from "@/components/LanguageStats";
+import ContributionTracker from "@/components/ContributionTracker";
+import AdvancedSearch from "@/components/AdvancedSearch";
+import QualityChecker from "@/components/QualityChecker";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 const Index = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const isMobile = useIsMobile();
 
   // Close sidebar automatically when switching from desktop to mobile
@@ -21,7 +27,14 @@ const Index = () => {
       setIsOpen(false);
     }
   }, [isMobile]);
-  return <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+
+  // Function to trigger refresh of stats components
+  const handleTranslationAdded = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header onSidebarToggle={() => setIsOpen(!isOpen)} />
       
       <div className="flex-1 flex">
@@ -33,6 +46,12 @@ const Index = () => {
               Help build an Ibọnọ translation AI model by contributing English-Ibọnọ translation pairs. 
               Your contributions will help preserve and promote the Ibọnọ language for future generations.
             </p>
+          </div>
+
+          {/* Stats Dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <LanguageStats refreshTrigger={refreshTrigger} />
+            <ContributionTracker />
           </div>
 
           <div className="card-enhanced p-6 sm:p-8 mb-10 sm:mb-14 transition-all">
@@ -48,24 +67,38 @@ const Index = () => {
 
         {/* Sidebar Sheet */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetContent side={isMobile ? "bottom" : "right"} className={`${isMobile ? 'h-[80vh] w-full rounded-t-xl' : 'w-[90vw] sm:w-[540px]'} p-0 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900`}>
+          <SheetContent side={isMobile ? "bottom" : "right"} className={`${isMobile ? 'h-[80vh] w-full rounded-t-xl' : 'w-[90vw] sm:w-[640px]'} p-0 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900`}>
             <div className="h-full overflow-y-auto p-4 sm:p-6">
               <div className="space-y-6 sm:space-y-8">
                 <TranslationDemo />
                 
                 <div className="mt-6 sm:mt-8">
                   <Tabs defaultValue="dataset" className="w-full">
-                    <TabsList className="mb-4 bg-blue-100/50 dark:bg-blue-900/30">
-                      <TabsTrigger value="dataset" className="text-sm sm:text-base data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        Dataset Management
+                    <TabsList className="mb-4 bg-blue-100/50 dark:bg-blue-900/30 grid grid-cols-4 w-full">
+                      <TabsTrigger value="dataset" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
+                        Dataset
                       </TabsTrigger>
-                      <TabsTrigger value="pipeline" className="text-sm sm:text-base data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        ML Pipeline
+                      <TabsTrigger value="search" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
+                        Search
+                      </TabsTrigger>
+                      <TabsTrigger value="quality" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
+                        Quality
+                      </TabsTrigger>
+                      <TabsTrigger value="pipeline" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
+                        ML
                       </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="dataset">
                       <DatasetViewer />
+                    </TabsContent>
+                    
+                    <TabsContent value="search">
+                      <AdvancedSearch />
+                    </TabsContent>
+                    
+                    <TabsContent value="quality">
+                      <QualityChecker />
                     </TabsContent>
                     
                     <TabsContent value="pipeline">
@@ -106,10 +139,7 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Column 2: Quick Links */}
-            
-            
-            {/* Column 3: Community */}
+            {/* Column 2: Community */}
             <div className="space-y-5">
               <h3 className="text-lg font-semibold text-teal-200">Community</h3>
               <p className="text-blue-100 text-sm">
@@ -124,11 +154,23 @@ const Index = () => {
               </a>
             </div>
             
+            {/* Column 3: Features */}
+            <div className="space-y-5">
+              <h3 className="text-lg font-semibold text-teal-200">Features</h3>
+              <ul className="text-blue-100 text-sm space-y-2">
+                <li>• Translation Collection</li>
+                <li>• Quality Assurance</li>
+                <li>• Advanced Search</li>
+                <li>• Progress Tracking</li>
+                <li>• ML Pipeline</li>
+                <li>• Offline Support</li>
+              </ul>
+            </div>
+            
             {/* Column 4: Contact */}
             <div className="space-y-5">
               <h3 className="text-lg font-semibold text-teal-200">Contact Us</h3>
               <div className="space-y-3 text-sm">
-                
                 <p className="text-blue-100">
                   <span className="block font-medium">Email:</span>
                   <a href="mailto:robertsunday333@gmail.com" className="hover:text-white transition-colors">
@@ -156,11 +198,12 @@ const Index = () => {
             <div className="flex gap-6 flex-wrap justify-center">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              
             </div>
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

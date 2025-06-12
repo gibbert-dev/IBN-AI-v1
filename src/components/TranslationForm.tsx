@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { saveTranslation } from "@/utils/syncService"; // Changed to use syncService
@@ -10,7 +9,11 @@ import SuggestionAlert from "./translation/SuggestionAlert";
 import useEnglishDetection from "@/hooks/useEnglishDetection";
 import { useOfflineStatus } from "@/context/OfflineContext";
 
-const TranslationForm = () => {
+interface TranslationFormProps {
+  onTranslationAdded?: () => void;
+}
+
+const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
   const [englishText, setEnglishText] = useState("");
   const [ibonoText, setIbonoText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -167,6 +170,11 @@ const TranslationForm = () => {
         // Clear the form only on success
         setEnglishText("");
         setIbonoText("");
+        
+        // Notify parent component that a translation was added
+        if (onTranslationAdded) {
+          onTranslationAdded();
+        }
       }
     } catch (error) {
       console.error("Error saving translation:", error);
