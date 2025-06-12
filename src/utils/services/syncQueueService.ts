@@ -1,3 +1,4 @@
+
 import { 
   addToSyncQueue, 
   getSyncQueue, 
@@ -45,13 +46,12 @@ export const syncWithServer = async (): Promise<void> => {
           case 'create':
             console.log(`Syncing create operation for: ${item.data.english}`);
             
-            const result = await saveToSupabase(item.data.english, item.data.ibono);
+            const result = await saveToSupabase(item.data.english, item.data.ibono, item.data.context);
             
             if (!result.isDuplicate && result.data) {
-              // Update local record with server ID
-              if (item.data.local_id) {
-                await updateLocalTranslation({
-                  ...item.data,
+              // Update local record with server ID - fixed function call
+              if (item.data.id) {
+                await updateLocalTranslation(item.data.id, {
                   id: result.data.id,
                   is_synced: true,
                   sync_status: 'synced',
@@ -61,7 +61,7 @@ export const syncWithServer = async (): Promise<void> => {
             }
             
             // Remove from sync queue regardless of result
-            await removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id!);
             break;
             
           case 'delete':
@@ -71,19 +71,19 @@ export const syncWithServer = async (): Promise<void> => {
             }
             
             // If there's a local ID, delete the local record too
-            if (item.data.local_id) {
-              await deleteLocalTranslation(item.data.local_id);
+            if (item.data.id) {
+              await deleteLocalTranslation(item.data.id);
             }
             
             // Remove from sync queue
-            await removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id!);
             break;
             
           // Add update case if needed in the future
             
           default:
             console.warn(`Unknown operation type: ${item.operation}`);
-            await removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id!);
         }
       } catch (error) {
         console.error(`Error processing sync item ${item.id}:`, error);
@@ -123,7 +123,9 @@ export const syncLocalWithRemote = async (remoteTranslations: Translation[]): Pr
           id: remote.id,
           english: remote.english,
           ibono: remote.ibono,
+          context: remote.context,
           created_at: remote.created_at,
+          user_id: remote.user_id,
           is_synced: true,
           sync_status: 'synced'
         });

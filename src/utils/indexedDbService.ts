@@ -1,3 +1,4 @@
+
 import Dexie, { Table } from 'dexie';
 
 export interface LocalTranslation {
@@ -15,7 +16,7 @@ export interface SyncQueueItem {
   id?: number;
   operation: 'create' | 'update' | 'delete';
   data: LocalTranslation;
-  createdAt?: Date;
+  timestamp: number; // Changed from createdAt to timestamp
 }
 
 class IbonoDatabase extends Dexie {
@@ -26,7 +27,7 @@ class IbonoDatabase extends Dexie {
     super('IbonoDatabase');
     this.version(3).stores({
       translations: '++id, english, ibono, is_synced, sync_status',
-      syncQueue: '++id, operation, createdAt'
+      syncQueue: '++id, operation, timestamp'
     });
   }
 }
@@ -59,11 +60,19 @@ export const clearLocalTranslations = async (): Promise<void> => {
   await db.translations.clear();
 };
 
-// Sync Queue Operations
-export const addToSyncQueue = async (item: Omit<SyncQueueItem, 'id' | 'createdAt'>): Promise<SyncQueueItem> => {
-  const newItem = { ...item, createdAt: new Date() };
+// Sync Queue Operations - Fixed function names to match imports
+export const addToSyncQueue = async (item: Omit<SyncQueueItem, 'id' | 'timestamp'>): Promise<SyncQueueItem> => {
+  const newItem = { ...item, timestamp: Date.now() };
   const id = await db.syncQueue.add(newItem);
   return { ...newItem, id };
+};
+
+export const getSyncQueue = async (): Promise<SyncQueueItem[]> => {
+  return await db.syncQueue.toArray();
+};
+
+export const removeFromSyncQueue = async (id: number): Promise<void> => {
+  await db.syncQueue.delete(id);
 };
 
 export const getSyncQueueItems = async (): Promise<SyncQueueItem[]> => {
