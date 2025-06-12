@@ -1,4 +1,3 @@
-
 /**
  * IndexedDB service for local storage of translations
  */
@@ -14,6 +13,7 @@ export interface LocalTranslation {
   local_id?: number; // Local database ID
   english: string;
   ibono: string;
+  context?: string; // New optional context field
   created_at?: string;
   updated_at?: string;
   is_synced?: boolean;

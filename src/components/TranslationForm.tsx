@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { saveTranslation } from "@/utils/syncService"; // Changed to use syncService
@@ -16,6 +17,7 @@ interface TranslationFormProps {
 const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
   const [englishText, setEnglishText] = useState("");
   const [ibonoText, setIbonoText] = useState("");
+  const [contextText, setContextText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [duplicateAlert, setDuplicateAlert] = useState<{
     type: 'exact' | 'english',
@@ -65,6 +67,17 @@ const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
     }
   };
 
+  const handleContextChange = (text: string) => {
+    setContextText(text);
+    
+    // Validate that context is not just repeating the English text
+    if (text.trim() && text.trim().toLowerCase() === englishText.trim().toLowerCase()) {
+      setEnglishValidationError("Context should not just repeat the English text. Explain when or how it's used.");
+    } else if (englishValidationError?.includes("Context should not")) {
+      setEnglishValidationError(null);
+    }
+  };
+
   const handleReplaceSuggestion = (replacement: string) => {
     if (!suggestions) return;
     
@@ -94,6 +107,27 @@ const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
         variant: "destructive"
       });
       return;
+    }
+    
+    // Validate context if provided
+    if (contextText.trim()) {
+      if (contextText.trim().toLowerCase() === englishText.trim().toLowerCase()) {
+        toast({
+          title: "Validation Error",
+          description: "Context should explain usage, not repeat the English text.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (contextText.length > 200) {
+        toast({
+          title: "Validation Error", 
+          description: "Context should be kept concise (under 200 characters).",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     // Check for English in Ibọnọ field
@@ -135,8 +169,8 @@ const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
     setDuplicateAlert(null);
     
     try {
-      console.log("Saving translation:", { englishText, ibonoText });
-      const result = await saveTranslation(englishText, ibonoText);
+      console.log("Saving translation:", { englishText, ibonoText, contextText });
+      const result = await saveTranslation(englishText, ibonoText, contextText.trim() || undefined);
       console.log("Save result:", result);
       
       if (result.isDuplicate && result.existingTranslation) {
@@ -170,6 +204,7 @@ const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
         // Clear the form only on success
         setEnglishText("");
         setIbonoText("");
+        setContextText("");
         
         // Notify parent component that a translation was added
         if (onTranslationAdded) {
@@ -230,6 +265,8 @@ const TranslationForm = ({ onTranslationAdded }: TranslationFormProps) => {
         onReplaceSuggestion={handleReplaceSuggestion}
         hasExtraSpaces={englishHasExtraSpaces}
         repeatedWords={detectedRepeatedWords}
+        context={contextText}
+        onContextChange={handleContextChange}
       />
     </TranslationFormContainer>
   );

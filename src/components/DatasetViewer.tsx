@@ -1,16 +1,20 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getTranslations, deleteTranslation, clearAllTranslations } from "@/utils/databaseUtils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
-import { X, Download, Trash2 } from "lucide-react";
+import { X, Download, Trash2, Eye } from "lucide-react";
 import ExportOptions from "./ExportOptions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   
   useEffect(() => {
     loadTranslations();
@@ -119,9 +123,9 @@ const DatasetViewer = () => {
     }
     
     try {
-      const headers = "id,english,ibono,created_at\n";
+      const headers = "id,english,ibono,context,created_at\n";
       const rows = translations.map(t => 
-        `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.created_at || ''}`
+        `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}","${(t.context || '').replace(/"/g, '""')}",${t.created_at || ''}`
       ).join("\n");
       
       const csvData = headers + rows;
@@ -149,12 +153,18 @@ const DatasetViewer = () => {
     }
   };
 
+  const translationsWithContext = translations.filter(t => t.context?.trim());
+  const contextPercentage = translations.length > 0 ? Math.round((translationsWithContext.length / translations.length) * 100) : 0;
+
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Dataset Management</CardTitle>
-        <CardDescription>
-          {translations.length} entries collected
+        <CardDescription className="flex items-center gap-4">
+          <span>{translations.length} entries collected</span>
+          <Badge variant="secondary" className="text-xs">
+            {contextPercentage}% with context
+          </Badge>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -176,25 +186,61 @@ const DatasetViewer = () => {
                     <TableRow>
                       <TableHead>English</TableHead>
                       <TableHead>Ibọnọ</TableHead>
+                      <TableHead className="w-[60px]">Context</TableHead>
                       <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {translations.slice(0, 50).map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.english}</TableCell>
-                        <TableCell>{item.ibono}</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => handleDelete(item.id)}
-                            className="h-8 w-8"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                      <>
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.english}</TableCell>
+                          <TableCell>{item.ibono}</TableCell>
+                          <TableCell>
+                            {item.context?.trim() ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-6 w-6"
+                                      onClick={() => setExpandedRow(expandedRow === item.id ? null : item.id)}
+                                    >
+                                      <Eye className="h-3 w-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs text-sm">{item.context}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleDelete(item.id)}
+                              className="h-8 w-8"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        {expandedRow === item.id && item.context?.trim() && (
+                          <TableRow>
+                            <TableCell colSpan={4} className="bg-muted/50 p-4">
+                              <div className="text-sm">
+                                <span className="font-medium text-muted-foreground">Context: </span>
+                                <span>{item.context}</span>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
                     ))}
                   </TableBody>
                 </Table>

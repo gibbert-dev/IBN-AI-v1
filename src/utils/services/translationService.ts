@@ -39,19 +39,20 @@ export const findLocalDuplicate = async (english: string, ibono: string): Promis
 };
 
 // Save a translation (to Supabase if online, or locally if offline)
-export const saveTranslation = async (english: string, ibono: string): Promise<{
+export const saveTranslation = async (english: string, ibono: string, context?: string): Promise<{
   data: Translation | LocalTranslation | null; 
   isDuplicate: boolean; 
   existingTranslation: Translation | LocalTranslation | null;
 }> => {
   const trimmedEnglish = english.trim();
   const trimmedIbono = ibono.trim();
+  const trimmedContext = context?.trim() || undefined;
 
   try {
     if (checkOnlineStatus()) {
       // Try saving to Supabase
       console.log('Saving to Supabase');
-      const result = await saveToSupabase(trimmedEnglish, trimmedIbono);
+      const result = await saveToSupabase(trimmedEnglish, trimmedIbono, trimmedContext);
       
       if (!result.isDuplicate && result.data) {
         // Also save to local database for offline access
@@ -59,6 +60,7 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
           id: result.data.id,
           english: trimmedEnglish,
           ibono: trimmedIbono,
+          context: trimmedContext,
           created_at: result.data.created_at,
           is_synced: true,
           sync_status: 'synced'
@@ -86,6 +88,7 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
       const newLocal: LocalTranslation = {
         english: trimmedEnglish,
         ibono: trimmedIbono,
+        context: trimmedContext,
         created_at: new Date().toISOString(),
         is_synced: false,
         sync_status: 'pending'

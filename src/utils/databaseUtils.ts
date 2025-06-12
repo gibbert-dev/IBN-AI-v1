@@ -1,4 +1,3 @@
-
 import { supabase } from './supabaseClient';
 import { LocalTranslation } from './indexedDbService';
 
@@ -6,6 +5,7 @@ export interface Translation {
   id: number;
   english: string;
   ibono: string;
+  context?: string; // New optional context field
   created_at?: string; // Using created_at instead of timestamp as it's likely Supabase's default
 }
 
@@ -50,7 +50,7 @@ export const findExistingTranslation = async (english: string, ibono: string): P
   }
 };
 
-export const saveTranslation = async (english: string, ibono: string): Promise<{ 
+export const saveTranslation = async (english: string, ibono: string, context?: string): Promise<{ 
   data: Translation | null; 
   isDuplicate: boolean; 
   existingTranslation: Translation | null 
@@ -59,6 +59,7 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
     // Trim inputs to avoid whitespace-only differences
     const trimmedEnglish = english.trim();
     const trimmedIbono = ibono.trim();
+    const trimmedContext = context?.trim() || undefined;
     
     // First check if this translation already exists
     const existingTranslation = await findExistingTranslation(trimmedEnglish, trimmedIbono);
@@ -75,6 +76,7 @@ export const saveTranslation = async (english: string, ibono: string): Promise<{
     const newTranslation = {
       english: trimmedEnglish,
       ibono: trimmedIbono,
+      context: trimmedContext,
       // Supabase will handle the created_at timestamp automatically
     };
     
@@ -174,6 +176,7 @@ export const exportTranslationsAsJSON = async (): Promise<string> => {
       id: t.id,
       english: t.english,
       ibono: t.ibono,
+      context: t.context || null,
       created_at: t.created_at || null
     }));
     return JSON.stringify(cleanData, null, 2);
@@ -187,9 +190,9 @@ export const exportTranslationsAsCSV = async (): Promise<string> => {
   const translations = await getTranslations();
   if (translations.length === 0) return "";
   
-  const headers = "id,english,ibono,created_at\n";
+  const headers = "id,english,ibono,context,created_at\n";
   const rows = translations.map(t => 
-    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}",${t.created_at || ''}`
+    `${t.id},"${t.english.replace(/"/g, '""')}","${t.ibono.replace(/"/g, '""')}","${(t.context || '').replace(/"/g, '""')}",${t.created_at || ''}`
   ).join("\n");
   
   return headers + rows;
@@ -201,6 +204,7 @@ export const localToRemote = (local: LocalTranslation): Translation => {
     id: local.id || 0, // Default to 0 for new entries
     english: local.english,
     ibono: local.ibono,
+    context: local.context,
     created_at: local.created_at
   };
 };
@@ -211,6 +215,7 @@ export const remoteToLocal = (remote: Translation): LocalTranslation => {
     id: remote.id,
     english: remote.english,
     ibono: remote.ibono,
+    context: remote.context,
     created_at: remote.created_at,
     is_synced: true,
     sync_status: 'synced'
