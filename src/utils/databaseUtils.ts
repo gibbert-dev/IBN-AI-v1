@@ -1,9 +1,8 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { LocalTranslation } from './indexedDbService';
 
 export interface Translation {
-  id: number;
+  id: string; // Changed from number to string to match UUID
   english: string;
   ibono: string;
   context?: string;
@@ -153,7 +152,7 @@ export const getTranslations = async (): Promise<Translation[]> => {
   }
 };
 
-export const deleteTranslation = async (id: number): Promise<void> => {
+export const deleteTranslation = async (id: string): Promise<void> => { // Changed parameter type from number to string
   const { error } = await supabase
     .from(TABLE_NAME)
     .delete()
@@ -217,7 +216,7 @@ export const exportTranslationsAsCSV = async (): Promise<string> => {
 // Helper function to convert LocalTranslation to Translation
 export const localToRemote = (local: LocalTranslation): Translation => {
   return {
-    id: local.id || 0, // Default to 0 for new entries
+    id: local.id || crypto.randomUUID(), // Generate UUID for new entries
     english: local.english,
     ibono: local.ibono,
     context: local.context,

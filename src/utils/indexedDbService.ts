@@ -1,289 +1,79 @@
-
-/**
- * IndexedDB service for local storage of translations
- */
-
-// Database configuration
-const DB_NAME = 'ibnai_offline_db';
-const DB_VERSION = 1;
-const TRANSLATIONS_STORE = 'translations';
-const SYNC_QUEUE_STORE = 'syncQueue';
+import Dexie, { Table } from 'dexie';
 
 export interface LocalTranslation {
-  id?: number; // Optional for new items
-  local_id?: number; // Local database ID
+  id?: string; // Changed from number to string to match UUID
   english: string;
   ibono: string;
   context?: string;
-  user_id?: string; // Added user_id field
   created_at?: string;
-  updated_at?: string;
+  user_id?: string;
   is_synced?: boolean;
-  sync_status?: 'pending' | 'synced' | 'error';
-  sync_error?: string;
+  sync_status?: 'pending' | 'syncing' | 'synced' | 'error';
 }
 
 export interface SyncQueueItem {
-  id: number;
+  id?: number;
   operation: 'create' | 'update' | 'delete';
   data: LocalTranslation;
-  timestamp: number;
-  attempts: number;
+  createdAt?: Date;
 }
 
-// Initialize the database
-export const initializeDb = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+class IbonoDatabase extends Dexie {
+  translations!: Table<LocalTranslation, string>;
+  syncQueue!: Table<SyncQueueItem, number>;
 
-    request.onerror = (event) => {
-      console.error('IndexedDB error:', event);
-      reject('Error opening IndexedDB');
-    };
-
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      
-      // Create translations store
-      if (!db.objectStoreNames.contains(TRANSLATIONS_STORE)) {
-        const store = db.createObjectStore(TRANSLATIONS_STORE, { keyPath: 'local_id', autoIncrement: true });
-        store.createIndex('id', 'id', { unique: false }); // Supabase ID
-        store.createIndex('english', 'english', { unique: false });
-        store.createIndex('is_synced', 'is_synced', { unique: false });
-      }
-      
-      // Create sync queue store
-      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE)) {
-        const syncStore = db.createObjectStore(SYNC_QUEUE_STORE, { keyPath: 'id', autoIncrement: true });
-        syncStore.createIndex('operation', 'operation', { unique: false });
-        syncStore.createIndex('timestamp', 'timestamp', { unique: false });
-      }
-    };
-  });
-};
-
-// Get a database connection
-export const getDbConnection = async (): Promise<IDBDatabase> => {
-  try {
-    return await initializeDb();
-  } catch (error) {
-    console.error('Failed to get DB connection:', error);
-    throw error;
+  constructor() {
+    super('IbonoDatabase');
+    this.version(3).stores({
+      translations: '++id, english, ibono, is_synced, sync_status',
+      syncQueue: '++id, operation, createdAt'
+    });
   }
-};
+}
 
-// Add a translation to local database
+const db = new IbonoDatabase();
+
+// Translations Table Operations
 export const addLocalTranslation = async (translation: LocalTranslation): Promise<LocalTranslation> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([TRANSLATIONS_STORE], 'readwrite');
-    const store = transaction.objectStore(TRANSLATIONS_STORE);
-    
-    // Add timestamps and sync status
-    const translationWithMeta = {
-      ...translation,
-      created_at: translation.created_at || new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      is_synced: translation.is_synced || false,
-      sync_status: translation.sync_status || 'pending' as const
-    };
-    
-    const request = store.add(translationWithMeta);
-    
-    request.onsuccess = () => {
-      const local_id = request.result as number;
-      resolve({ ...translationWithMeta, local_id });
-    };
-    
-    request.onerror = () => {
-      reject('Error adding translation to local database');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+  const id = await db.translations.add(translation);
+  return { ...translation, id: id.toString() };
 };
 
-// Get all translations from local database
+export const updateLocalTranslation = async (id: string, updates: Partial<LocalTranslation>): Promise<void> => {
+  await db.translations.update(id, updates);
+};
+
+export const deleteLocalTranslation = async (id: string): Promise<void> => {
+  await db.translations.delete(id);
+};
+
+export const getLocalTranslationById = async (id: string): Promise<LocalTranslation | undefined> => {
+  return await db.translations.get(id);
+};
+
 export const getLocalTranslations = async (): Promise<LocalTranslation[]> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([TRANSLATIONS_STORE], 'readonly');
-    const store = transaction.objectStore(TRANSLATIONS_STORE);
-    const request = store.getAll();
-    
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-    
-    request.onerror = () => {
-      reject('Error getting translations from local database');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+  return await db.translations.toArray();
 };
 
-// Find a translation in local database
-export const findLocalTranslation = async (english: string, ibono: string): Promise<LocalTranslation | null> => {
-  const translations = await getLocalTranslations();
-  
-  // Look for exact match (both English and Ibọnọ)
-  const exactMatch = translations.find(
-    t => t.english.trim().toLowerCase() === english.trim().toLowerCase() && 
-         t.ibono.trim().toLowerCase() === ibono.trim().toLowerCase()
-  );
-  
-  if (exactMatch) return exactMatch;
-  
-  // Look for matching English only
-  const englishMatch = translations.find(
-    t => t.english.trim().toLowerCase() === english.trim().toLowerCase()
-  );
-  
-  return englishMatch || null;
+export const clearLocalTranslations = async (): Promise<void> => {
+  await db.translations.clear();
 };
 
-// Add an item to the sync queue
-export const addToSyncQueue = async (item: Omit<SyncQueueItem, 'id' | 'attempts' | 'timestamp'>): Promise<number> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([SYNC_QUEUE_STORE], 'readwrite');
-    const store = transaction.objectStore(SYNC_QUEUE_STORE);
-    
-    const queueItem = {
-      ...item,
-      timestamp: Date.now(),
-      attempts: 0
-    };
-    
-    const request = store.add(queueItem);
-    
-    request.onsuccess = () => {
-      resolve(request.result as number);
-    };
-    
-    request.onerror = () => {
-      reject('Error adding item to sync queue');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+// Sync Queue Operations
+export const addToSyncQueue = async (item: Omit<SyncQueueItem, 'id' | 'createdAt'>): Promise<SyncQueueItem> => {
+  const newItem = { ...item, createdAt: new Date() };
+  const id = await db.syncQueue.add(newItem);
+  return { ...newItem, id };
 };
 
-// Get all items from the sync queue
-export const getSyncQueue = async (): Promise<SyncQueueItem[]> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([SYNC_QUEUE_STORE], 'readonly');
-    const store = transaction.objectStore(SYNC_QUEUE_STORE);
-    const request = store.getAll();
-    
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-    
-    request.onerror = () => {
-      reject('Error getting sync queue');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+export const getSyncQueueItems = async (): Promise<SyncQueueItem[]> => {
+  return await db.syncQueue.toArray();
 };
 
-// Remove an item from the sync queue
-export const removeFromSyncQueue = async (id: number): Promise<void> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([SYNC_QUEUE_STORE], 'readwrite');
-    const store = transaction.objectStore(SYNC_QUEUE_STORE);
-    const request = store.delete(id);
-    
-    request.onsuccess = () => {
-      resolve();
-    };
-    
-    request.onerror = () => {
-      reject('Error removing item from sync queue');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+export const deleteSyncQueueItem = async (id: number): Promise<void> => {
+  await db.syncQueue.delete(id);
 };
 
-// Update a local translation
-export const updateLocalTranslation = async (translation: LocalTranslation): Promise<void> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([TRANSLATIONS_STORE], 'readwrite');
-    const store = transaction.objectStore(TRANSLATIONS_STORE);
-    
-    // Make sure we have a local_id
-    if (!translation.local_id) {
-      reject('Cannot update translation without local_id');
-      return;
-    }
-    
-    // Update timestamp
-    const updatedTranslation = {
-      ...translation,
-      updated_at: new Date().toISOString()
-    };
-    
-    const request = store.put(updatedTranslation);
-    
-    request.onsuccess = () => {
-      resolve();
-    };
-    
-    request.onerror = () => {
-      reject('Error updating translation in local database');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
-};
-
-// Delete a local translation
-export const deleteLocalTranslation = async (localId: number): Promise<void> => {
-  const db = await getDbConnection();
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([TRANSLATIONS_STORE], 'readwrite');
-    const store = transaction.objectStore(TRANSLATIONS_STORE);
-    const request = store.delete(localId);
-    
-    request.onsuccess = () => {
-      resolve();
-    };
-    
-    request.onerror = () => {
-      reject('Error deleting translation from local database');
-    };
-    
-    transaction.oncomplete = () => {
-      db.close();
-    };
-  });
+export const clearSyncQueue = async (): Promise<void> => {
+  await db.syncQueue.clear();
 };

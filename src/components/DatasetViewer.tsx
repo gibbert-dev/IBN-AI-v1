@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
   
   useEffect(() => {
     loadTranslations();
@@ -37,7 +36,7 @@ const DatasetViewer = () => {
     }
   };
   
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       await deleteTranslation(id);
       await loadTranslations();
