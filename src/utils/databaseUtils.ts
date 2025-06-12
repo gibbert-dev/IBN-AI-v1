@@ -128,6 +128,23 @@ export const saveTranslation = async (english: string, ibono: string, context?: 
   }
 };
 
+export const updateTranslation = async (id: string, updates: Partial<Pick<Translation, 'context'>>): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from(TABLE_NAME)
+      .update(updates)
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Error updating translation:", error);
+      throw error;
+    }
+  } catch (e) {
+    console.error("Unexpected error during update:", e);
+    throw e;
+  }
+};
+
 export const getTranslations = async (): Promise<Translation[]> => {
   try {
     const { data, error } = await supabase

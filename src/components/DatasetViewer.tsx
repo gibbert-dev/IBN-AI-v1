@@ -9,6 +9,7 @@ import ExportOptions from "./ExportOptions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import EditableContext from "./EditableContext";
 
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<any[]>([]);
@@ -70,6 +71,14 @@ const DatasetViewer = () => {
         });
       }
     }
+  };
+
+  const handleContextUpdate = (id: string, newContext: string) => {
+    setTranslations(prev => 
+      prev.map(t => 
+        t.id === id ? { ...t, context: newContext } : t
+      )
+    );
   };
 
   const exportAsJSON = async () => {
@@ -183,63 +192,35 @@ const DatasetViewer = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>English</TableHead>
-                      <TableHead>Ibọnọ</TableHead>
-                      <TableHead className="w-[60px]">Context</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead className="w-[200px]">English</TableHead>
+                      <TableHead className="w-[200px]">Ibọnọ</TableHead>
+                      <TableHead className="w-[300px]">Context</TableHead>
+                      <TableHead className="w-[80px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {translations.slice(0, 50).map((item) => (
-                      <>
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium">{item.english}</TableCell>
-                          <TableCell>{item.ibono}</TableCell>
-                          <TableCell>
-                            {item.context?.trim() ? (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-6 w-6"
-                                      onClick={() => setExpandedRow(expandedRow === item.id ? null : item.id)}
-                                    >
-                                      <Eye className="h-3 w-3" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs text-sm">{item.context}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ) : (
-                              <span className="text-muted-foreground text-xs">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleDelete(item.id)}
-                              className="h-8 w-8"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                        {expandedRow === item.id && item.context?.trim() && (
-                          <TableRow>
-                            <TableCell colSpan={4} className="bg-muted/50 p-4">
-                              <div className="text-sm">
-                                <span className="font-medium text-muted-foreground">Context: </span>
-                                <span>{item.context}</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </>
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.english}</TableCell>
+                        <TableCell>{item.ibono}</TableCell>
+                        <TableCell>
+                          <EditableContext
+                            id={item.id}
+                            context={item.context}
+                            onUpdate={handleContextUpdate}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDelete(item.id)}
+                            className="h-8 w-8"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>
