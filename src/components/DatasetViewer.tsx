@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EditableContext from "./EditableContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<any[]>([]);
@@ -164,6 +165,22 @@ const DatasetViewer = () => {
   const translationsWithContext = translations.filter(t => t.context?.trim());
   const contextPercentage = translations.length > 0 ? Math.round((translationsWithContext.length / translations.length) * 100) : 0;
 
+  // Helper: skeleton rows
+  const SkeletonRows = () => (
+    <>
+      {[...Array(5)].map((_, idx) => (
+        <TableRow key={idx}>
+          <TableCell><Skeleton className="h-4 w-36" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-64" /></TableCell>
+          <TableCell>
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
+  );
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -184,8 +201,21 @@ const DatasetViewer = () => {
           
           <TabsContent value="view" className="space-y-4">
             {isLoading ? (
-              <div className="py-8 text-center text-muted-foreground">
-                Loading translations...
+              <div className="border rounded-md overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[200px]">English</TableHead>
+                      <TableHead className="w-[200px]">Ibọnọ</TableHead>
+                      <TableHead className="w-[300px]">Context</TableHead>
+                      <TableHead className="w-[80px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <SkeletonRows />
+                  </TableBody>
+                </Table>
+                <div className="p-4 text-center text-muted-foreground animate-pulse">Loading translations...</div>
               </div>
             ) : translations.length > 0 ? (
               <div className="border rounded-md overflow-hidden">
@@ -215,7 +245,9 @@ const DatasetViewer = () => {
                             variant="ghost" 
                             size="icon"
                             onClick={() => handleDelete(item.id)}
-                            className="h-8 w-8"
+                            className="h-8 w-8 outline-none focus-visible:ring-2 focus-visible:ring-ibonai-green"
+                            tabIndex={0}
+                            aria-label="Delete entry"
                           >
                             <X className="h-4 w-4" />
                           </Button>
