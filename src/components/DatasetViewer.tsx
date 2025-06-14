@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,12 +14,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import { useDebounce } from "@/hooks/useDebounce";
+
 const DatasetViewer = () => {
   const [translations, setTranslations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "english" | "ibono">("newest");
   
   useEffect(() => {
@@ -43,14 +45,14 @@ const DatasetViewer = () => {
       setIsLoading(false);
     }
   };
-  
+
   // Filtered and sorted translations with memoization
   const filteredAndSortedTranslations = useMemo(() => {
     let filtered = translations;
     
     // Apply search filter
-    if (searchTerm.trim()) {
-      const search = searchTerm.toLowerCase().trim();
+    if (debouncedSearchTerm.trim()) {
+      const search = debouncedSearchTerm.toLowerCase().trim();
       filtered = translations.filter(t => 
         t.english.toLowerCase().includes(search) ||
         t.ibono.toLowerCase().includes(search) ||
@@ -75,7 +77,7 @@ const DatasetViewer = () => {
     });
     
     return sorted;
-  }, [translations, searchTerm, sortBy]);
+  }, [translations, debouncedSearchTerm, sortBy]);
   
   // Pagination calculations
   const totalPages = Math.ceil(filteredAndSortedTranslations.length / itemsPerPage);
