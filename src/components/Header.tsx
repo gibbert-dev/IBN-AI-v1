@@ -3,17 +3,24 @@ import { Book, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import FeedbackDialog from "./FeedbackDialog";
+import { useNavigate } from "react-router-dom";
+
 interface HeaderProps {
-  onSidebarToggle: () => void;
+  // No more sidebar toggle
 }
-const Header = ({
-  onSidebarToggle
-}: HeaderProps) => {
+const Header = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
   return <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-400 text-white py-4 sm:py-5 px-5 sm:px-8 shadow-lg sticky top-0 z-10">
       <div className="container mx-auto flex justify-between items-center px-0">
         <div className="flex items-center space-x-3 sm:space-x-4">
-          <button onClick={onSidebarToggle} className="p-2 sm:p-2.5 hover:bg-white/15 rounded-md transition-colors duration-200" aria-label="Toggle Sidebar">
+          {/* Menu button now navigates to /management instead of toggling sidebar */}
+          <button 
+            onClick={() => navigate("/management")} 
+            className="p-2 sm:p-2.5 hover:bg-white/15 rounded-md transition-colors duration-200" 
+            aria-label="Open Management Page"
+          >
             <Menu size={isMobile ? 22 : 24} className="opacity-95" />
           </button>
           

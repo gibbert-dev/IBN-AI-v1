@@ -1,4 +1,3 @@
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import TranslationForm from "@/components/TranslationForm";
@@ -10,35 +9,23 @@ import LanguageStats from "@/components/LanguageStats";
 import ContributionTracker from "@/components/ContributionTracker";
 import AdvancedSearch from "@/components/AdvancedSearch";
 import QualityChecker from "@/components/QualityChecker";
-import { useState, useEffect } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Mail, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const isMobile = useIsMobile();
-
-  // Close sidebar automatically when switching from desktop to mobile
-  useEffect(() => {
-    if (isMobile && isOpen) {
-      setIsOpen(false);
-    }
-  }, [isMobile]);
-
   // Function to trigger refresh of stats components
+  // (Optional: you can restore this if needed for LanguageStats/ContributionTracker)
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const handleTranslationAdded = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header onSidebarToggle={() => setIsOpen(!isOpen)} />
-      
+      <Header />
       <div className="flex-1 flex">
-        {/* Main content */}
         <main className="flex-1 container mx-auto py-8 sm:py-10 px-5 sm:px-8 animate-fade-in">
           <div className="mb-10 sm:mb-14">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-6">IBN-AI</h1>
@@ -64,52 +51,6 @@ const Index = () => {
             <IbenoInfo />
           </div>
         </main>
-
-        {/* Sidebar Sheet */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetContent side={isMobile ? "bottom" : "right"} className={`${isMobile ? 'h-[80vh] w-full rounded-t-xl' : 'w-[90vw] sm:w-[640px]'} p-0 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900`}>
-            <div className="h-full overflow-y-auto p-4 sm:p-6">
-              <div className="space-y-6 sm:space-y-8">
-                <TranslationDemo />
-                
-                <div className="mt-6 sm:mt-8">
-                  <Tabs defaultValue="dataset" className="w-full">
-                    <TabsList className="mb-4 bg-blue-100/50 dark:bg-blue-900/30 grid grid-cols-4 w-full">
-                      <TabsTrigger value="dataset" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        Dataset
-                      </TabsTrigger>
-                      <TabsTrigger value="search" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        Search
-                      </TabsTrigger>
-                      <TabsTrigger value="quality" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        Quality
-                      </TabsTrigger>
-                      <TabsTrigger value="pipeline" className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
-                        ML
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="dataset">
-                      <DatasetViewer />
-                    </TabsContent>
-                    
-                    <TabsContent value="search">
-                      <AdvancedSearch />
-                    </TabsContent>
-                    
-                    <TabsContent value="quality">
-                      <QualityChecker />
-                    </TabsContent>
-                    
-                    <TabsContent value="pipeline">
-                      <MLPipeline />
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
       </div>
       
       <footer className="mt-auto bg-gradient-to-r from-blue-900 to-teal-900 text-white py-12 sm:py-16">
