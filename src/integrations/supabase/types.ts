@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       translations: {
         Row: {
+          context: string | null
           created_at: string | null
           english: string
           ibono: string | null
@@ -19,6 +20,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          context?: string | null
           created_at?: string | null
           english: string
           ibono?: string | null
@@ -27,6 +29,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          context?: string | null
           created_at?: string | null
           english?: string
           ibono?: string | null
