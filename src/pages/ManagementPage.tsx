@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DatasetViewer from "@/components/DatasetViewer";
 import TranslationDemo from "@/components/TranslationDemo";
@@ -149,7 +149,7 @@ const ManagementPage = () => {
               role="tabpanel"
               tabIndex={0}
             >
-              <ErrorBoundary fallback={<TabError error="Could not load section." />}>
+              <ErrorBoundary>
                 <React.Suspense fallback={<TabLoadingSkeleton label={`Loading ${tab.label}...`} />}>
                   {tab.render()}
                 </React.Suspense>
@@ -163,7 +163,7 @@ const ManagementPage = () => {
       <div className="block md:hidden pt-2 pb-20">
         {/* Tabs fake: use One Panel with only activeTab rendered for speed + a11y */}
         <div className="max-w-3xl mx-auto">
-          <ErrorBoundary fallback={<TabError error="Could not load section." />}>
+          <ErrorBoundary>
             <React.Suspense fallback={<TabLoadingSkeleton label={`Loading ${TABS_META.find(t=>t.key===activeTab)?.label ?? ""}...`} />}>
               {TABS_META.find(tab => tab.key === activeTab)?.render()}
             </React.Suspense>
